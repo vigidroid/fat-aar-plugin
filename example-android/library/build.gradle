@@ -21,7 +21,7 @@ android {
 
 dependencies {
     // jar file
-//    compile files('libs/alipaySdk-20161009.jar')
+//    embed files('libs/alipaySdk-20161009.jar')
     // aar project
     embed project(':aar-lib')
     // jar project

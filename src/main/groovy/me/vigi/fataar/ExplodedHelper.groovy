@@ -9,6 +9,9 @@ import org.gradle.api.file.FileTree
  */
 class ExplodedHelper {
 
+    /**
+     * iterate over all AndroidManifest.xml to resolve aar dependencies
+     */
     static FileTree resolveAllManifests(Project project) {
         def explodedRoot = project.file(project.buildDir.path + '/intermediates' + '/exploded-aar')
         def manifests = project.fileTree(explodedRoot) {
@@ -19,25 +22,30 @@ class ExplodedHelper {
     }
 
     static void processIntoJars(Project project, Collection<ResolvedArtifact> artifacts, File folderOut) {
-        resolveAllManifests(project).each { file ->
-            println 'vigi-->file=' + file
-            def aarRoot = file.parentFile
-            def prefix = aarRoot.parentFile.name + '-' + aarRoot.name
-
+        def aarRoot = project.file(project.buildDir.path + '/intermediates' + '/exploded-aar')
+        for (artifact in artifacts) {
+            def mid = artifact.moduleVersion.id
+            def mRoot = project.file(aarRoot.path + '/' + mid.group + '/' + mid.name + '/' + mid.version)
+            if (!mRoot.exists()) {
+                println 'vigi-->[warning]' + mRoot.path + ' not found!'
+                continue
+            }
+            println 'vigi-->aar=' + mRoot
+            def prefix = mid.name + '-' + mid.version
             project.copy {
-                from("$aarRoot.path/jars/classes.jar")
+                from("$mRoot.path/jars/classes.jar")
                 into folderOut
                 rename { prefix + '.jar' }
             }
             project.copy {
-                from("$aarRoot.path/jars") {
+                from("$mRoot.path/jars") {
                     include '*.jar'
                     exclude 'classes.jar'
                 }
-                from("$aarRoot.path/jars/libs") {
+                from("$mRoot.path/jars/libs") {
                     include '*.jar'
                 }
-                from("$aarRoot.path/libs") {
+                from("$mRoot.path/libs") {
                     include '*.jar'
                 }
                 into folderOut
@@ -46,16 +54,22 @@ class ExplodedHelper {
         }
     }
 
-    static void processIntoClasses(Project project, File folderOut) {
-        resolveAllManifests(project).each { file ->
-            println 'vigi-->file=' + file
-            def aarRoot = file.parentFile
-            def jarsTree = project.fileTree(aarRoot) {
+    static void processIntoClasses(Project project, Collection<ResolvedArtifact> artifacts, File folderOut) {
+        def aarRoot = project.file(project.buildDir.path + '/intermediates' + '/exploded-aar')
+        for (artifact in artifacts) {
+            def mid = artifact.moduleVersion.id
+            def mRoot = project.file(aarRoot.path + '/' + mid.group + '/' + mid.name + '/' + mid.version)
+            if (!mRoot.exists()) {
+                println 'vigi-->[warning]' + mRoot.path + ' not found!'
+                continue
+            }
+            println 'vigi-->aar=' + mRoot
+            def jarsTree = project.fileTree(mRoot) {
                 include 'jars/*.jar'
                 include 'jars/libs/*.jar'
                 include 'libs/*.jar'
             }
-            jarsTree.each { jar ->
+            for (jar in jarsTree) {
                 project.copy {
                     from project.zipTree(jar)
                     into folderOut

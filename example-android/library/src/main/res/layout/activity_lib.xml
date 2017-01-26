@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:gravity="center_horizontal"
     android:orientation="vertical"
-    tools:context="me.vigi.fataar.lib.LibActivity">
+    tools:context=".LibActivity">
 
     <Button
         android:id="@+id/lib_bt"

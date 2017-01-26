@@ -50,10 +50,11 @@ class FatLibraryPlugin implements Plugin<Project> {
     private void resolveArtifacts() {
         def set = new HashSet<>()
         embedConf.resolvedConfiguration.resolvedArtifacts.each { artifact ->
-            if (!artifact.file.name.endsWith('.aar')) {
+            // jar file wouldn't be here
+            if (!'aar'.equals(artifact.type)) {
                 throw new ProjectConfigurationException('Only support embed .aar dependencies!', null)
             }
-            println 'vigi-->artifact=' + artifact.file
+            println 'vigi-->artifact=[' + artifact.type + ']' + artifact.moduleVersion.id
             set.add(artifact)
         }
         artifacts = Collections.unmodifiableSet(set)
@@ -77,7 +78,7 @@ class FatLibraryPlugin implements Plugin<Project> {
             }
             javacTask.doLast {
                 def dustDir = project.file(project.buildDir.path + '/intermediates/classes/' + variant.name)
-                ExplodedHelper.processIntoClasses(project, dustDir)
+                ExplodedHelper.processIntoClasses(project, artifacts, dustDir)
             }
         }
     }

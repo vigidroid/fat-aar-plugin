@@ -51,10 +51,11 @@ class FatLibraryPlugin implements Plugin<Project> {
         def set = new HashSet<>()
         embedConf.resolvedConfiguration.resolvedArtifacts.each { artifact ->
             // jar file wouldn't be here
-            if (!'aar'.equals(artifact.type)) {
-                throw new ProjectConfigurationException('Only support embed .aar dependencies!', null)
+            if ('aar'.equals(artifact.type) || 'jar'.equals(artifact.type)) {
+                println 'vigi-->artifact=[' + artifact.type + ']' + artifact.moduleVersion.id + ', file=' + artifact.file
+            } else {
+                throw new ProjectConfigurationException('Only support embed .aar and .jar dependencies!', null)
             }
-            println 'vigi-->artifact=[' + artifact.type + ']' + artifact.moduleVersion.id
             set.add(artifact)
         }
         artifacts = Collections.unmodifiableSet(set)

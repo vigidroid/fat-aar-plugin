@@ -23,16 +23,16 @@ dependencies {
     // jar file
 //    embed files('libs/alipaySdk-20161009.jar')
     // aar project
-    embed project(':aar-lib')
+//    embed project(':aar-lib')
     // jar project
-//    embed project(':java-lib')
+    embed project(':java-lib')
 //    compile 'com.android.support:design:25.1.0'
     // aar, has dependencies, minsdk=9
 //    compile 'com.android.support:palette-v7:25.1.0'
     // aar, has dependencies, has res, has proguard.txt, has public.txt, has R.txt, minsdk=9
 //    compile 'com.android.support:recyclerview-v7:25.1.0'
     // bundle jar, has dependencies
-//    embed 'com.google.guava:guava:20.0'
+    embed 'com.google.guava:guava:20.0'
     // aar, no dependency, minsdk=8
     embed 'com.android.volley:volley:1.0.0'
 //    compile 'io.reactivex:rxjava:1.2.5'

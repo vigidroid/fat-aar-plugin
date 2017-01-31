@@ -16,6 +16,9 @@
 #   public *;
 #}
 
+-renamesourcefileattribute SourceFile
+-keepattributes SourceFile,LineNumberTable
+
 # for guava 20.0
 -dontwarn javax.annotation.**
 -dontwarn javax.inject.**
@@ -25,6 +28,22 @@
 -dontwarn com.google.j2objc.annotations.**
 -dontwarn org.codehaus.mojo.**
 
+# for okhttp
+-dontwarn okhttp3.**
+
+# for rxjava
+-keepclassmembers class rx.internal.util.unsafe.*ArrayQueue*Field* {
+    long producerIndex;
+    long consumerIndex;
+}
+-keepclassmembers class rx.internal.util.unsafe.BaseLinkedQueueProducerNodeRef {
+    rx.internal.util.atomic.LinkedQueueNode producerNode;
+}
+-keepclassmembers class rx.internal.util.unsafe.BaseLinkedQueueConsumerNodeRef {
+    rx.internal.util.atomic.LinkedQueueNode consumerNode;
+}
+
 # keep whatever we like
--keep class com.google.**
--keep class me.vigi.fataar.**
+# -keep class com.google.** {*;}
+-keep class me.vigi.fataar.** {*;}
+# -keep class rx.**

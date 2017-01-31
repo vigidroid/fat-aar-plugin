@@ -3,12 +3,32 @@ package me.vigi.fataar
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.ProjectConfigurationException
+import org.gradle.api.Task
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.artifacts.DependencyResolutionListener
 import org.gradle.api.artifacts.ResolvableDependencies
 import org.gradle.api.artifacts.ResolvedArtifact
+import org.gradle.api.execution.TaskExecutionListener
+import org.gradle.api.tasks.TaskState
 
 /**
+ * TODO
+ * 1.into classes, "Note: duplicate definition of library class", when proguard
+ * 2.minSdkVersion check(done by processDebugAndroidTestManifest)
+ * 3.manifest merge
+ * 4.res merge
+ * 5.R.txt merge
+ * 6.assets merge
+ * 7.so merge
+ * 8.proguard.txt merge
+ * 9.lint.jar merge
+ * 10.support packaging bundle, like guava
+ * 11.configuration with extension
+ * 12.aidl merge?
+ * 13.other gradle version and android plugin version support
+ * 14.support compile project(aar, jar)
+ * 15.duplicate class check
+ *
  * Created by Vigi on 2017/1/14.
  */
 class FatLibraryPlugin implements Plugin<Project> {
@@ -44,6 +64,21 @@ class FatLibraryPlugin implements Plugin<Project> {
 
             @Override
             void afterResolve(ResolvableDependencies resolvableDependencies) {}
+        })
+        // for testing
+        project.gradle.addListener(new TaskExecutionListener() {
+            @Override
+            void beforeExecute(Task task) {}
+
+            @Override
+            void afterExecute(Task task, TaskState state) {
+                task.inputs.files.each {
+                    println '    input=' + it
+                }
+                task.outputs.files.each {
+                    println '    output=' + it
+                }
+            }
         })
     }
 
@@ -83,23 +118,4 @@ class FatLibraryPlugin implements Plugin<Project> {
             }
         }
     }
-
-    /**
-     * TODO
-     * 1.into classes, "Note: duplicate definition of library class", when proguard
-     * 2.minSdkVersion check(done by processDebugAndroidTestManifest)
-     * 3.manifest merge
-     * 4.res merge
-     * 5.R.txt merge
-     * 6.assets merge
-     * 7.so merge
-     * 8.proguard.txt merge
-     * 9.lint.jar merge
-     * 10.support packaging bundle, like guava
-     * 11.configuration with extension
-     * 12.aidl merge?
-     * 13.other gradle version and android plugin version support
-     * 14.support compile project(aar, jar)
-     * 15.duplicate class check
-     */
 }

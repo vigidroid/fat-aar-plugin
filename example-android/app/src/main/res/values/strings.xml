@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">fat-aar-plugin</string>
+    <string name="main_bt">Jump to LibActivity</string>
 </resources>

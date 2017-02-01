@@ -14,7 +14,7 @@ import org.gradle.api.tasks.TaskState
 /**
  * TODO
  * 1.into classes, "Note: duplicate definition of library class", when proguard
- * 2.minSdkVersion check(done by processDebugAndroidTestManifest)
+ * 2.minSdkVersion check(done by processDebugAndroidTestManifest??)
  * 3.manifest merge
  * 4.res merge
  * 5.R.txt merge
@@ -22,12 +22,13 @@ import org.gradle.api.tasks.TaskState
  * 7.so merge
  * 8.proguard.txt merge
  * 9.lint.jar merge
- * 10.support packaging bundle, like guava
  * 11.configuration with extension
  * 12.aidl merge?
  * 13.other gradle version and android plugin version support
  * 14.support compile project(aar, jar)
  * 15.duplicate class check
+ * 17.design of configuration. refer to, into libs or classes, make embed more flexible to each variant like
+ *    that android gradle plugin does, and combination of the prior
  *
  * Created by Vigi on 2017/1/14.
  */
@@ -40,6 +41,7 @@ class FatLibraryPlugin implements Plugin<Project> {
 
     @Override
     void apply(Project project) {
+        // todo android gradle plugin check
         this.project = project
         createConfiguration()
         project.afterEvaluate {
@@ -57,7 +59,10 @@ class FatLibraryPlugin implements Plugin<Project> {
             @Override
             void beforeResolve(ResolvableDependencies resolvableDependencies) {
                 embedConf.dependencies.each { dependency ->
-                    project.dependencies.add('compile', dependency)
+                    // use provided instead of compile to prune node dependency in
+                    // pom file when upload aar library archives.
+                    // but I have no idea whether have any side effect
+                    project.dependencies.add('provided', dependency)
                 }
                 project.gradle.removeListener(this)
             }
@@ -65,7 +70,7 @@ class FatLibraryPlugin implements Plugin<Project> {
             @Override
             void afterResolve(ResolvableDependencies resolvableDependencies) {}
         })
-        // for testing
+        // todo for testing and remove in future
         project.gradle.addListener(new TaskExecutionListener() {
             @Override
             void beforeExecute(Task task) {}
@@ -87,7 +92,7 @@ class FatLibraryPlugin implements Plugin<Project> {
         embedConf.resolvedConfiguration.resolvedArtifacts.each { artifact ->
             // jar file wouldn't be here
             if ('aar'.equals(artifact.type) || 'jar'.equals(artifact.type)) {
-                println 'vigi-->artifact=[' + artifact.type + ']' + artifact.moduleVersion.id + ', file=' + artifact.file
+                println 'fat-aar-->[embed detected][' + artifact.type + ']' + artifact.moduleVersion.id
             } else {
                 throw new ProjectConfigurationException('Only support embed .aar and .jar dependencies!', null)
             }
@@ -97,17 +102,7 @@ class FatLibraryPlugin implements Plugin<Project> {
     }
 
     private void processVariant(variant) {
-        if ('debug'.equals(variant.buildType.name)) {
-            def prepareTask = project.tasks.findByPath('prepare' + variant.name.capitalize() + 'Dependencies')
-            if (prepareTask == null) {
-                return
-            }
-            prepareTask.doLast {
-                def dustDir = project.file(project.buildDir.path + '/intermediates/bundles/' + variant.name + '/libs')
-                ExplodedHelper.processIntoJars(project, artifacts, dustDir)
-            }
-        }
-        if ('release'.equals(variant.buildType.name)) {
+        if (variant.buildType.isMinifyEnabled()) {
             def javacTask = project.tasks.findByPath('compile' + variant.name.capitalize() + 'JavaWithJavac')
             if (javacTask == null) {
                 return
@@ -115,6 +110,15 @@ class FatLibraryPlugin implements Plugin<Project> {
             javacTask.doLast {
                 def dustDir = project.file(project.buildDir.path + '/intermediates/classes/' + variant.name)
                 ExplodedHelper.processIntoClasses(project, artifacts, dustDir)
+            }
+        } else {
+            def prepareTask = project.tasks.findByPath('prepare' + variant.name.capitalize() + 'Dependencies')
+            if (prepareTask == null) {
+                return
+            }
+            prepareTask.doLast {
+                def dustDir = project.file(project.buildDir.path + '/intermediates/bundles/' + variant.name + '/libs')
+                ExplodedHelper.processIntoJars(project, artifacts, dustDir)
             }
         }
     }

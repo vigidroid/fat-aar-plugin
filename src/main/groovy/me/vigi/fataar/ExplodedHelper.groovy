@@ -29,10 +29,10 @@ class ExplodedHelper {
                 def mid = artifact.moduleVersion.id
                 def mRoot = project.file(aarRoot.path + '/' + mid.group + '/' + mid.name + '/' + mid.version)
                 if (!mRoot.exists()) {
-                    println 'vigi-->[warning]' + mRoot.path + ' not found!'
+                    println 'fat-aar-->[warning]' + mRoot.path + ' not found!'
                     continue
                 }
-                println 'vigi-->copy aar from: ' + mRoot
+                println 'fat-aar-->copy aar from: ' + mRoot
                 def prefix = mid.name + '-' + mid.version
                 project.copy {
                     from("$mRoot.path/jars/classes.jar")
@@ -56,10 +56,10 @@ class ExplodedHelper {
             }
             if ('jar'.equals(artifact.type)) {
                 if (!artifact.file.exists()) {
-                    println 'vigi-->[warning]' + artifact.file.path + ' not found!'
+                    println 'fat-aar-->[warning]' + artifact.file.path + ' not found!'
                     continue
                 }
-                println 'vigi-->copy jar from: ' + artifact.file
+                println 'fat-aar-->copy jar from: ' + artifact.file
                 project.copy {
                     from(artifact.file)
                     into folderOut
@@ -76,7 +76,7 @@ class ExplodedHelper {
                 def mid = artifact.moduleVersion.id
                 def mRoot = project.file(aarRoot.path + '/' + mid.group + '/' + mid.name + '/' + mid.version)
                 if (!mRoot.exists()) {
-                    println 'vigi-->[warning]' + mRoot.path + ' not found!'
+                    println 'fat-aar-->[warning]' + mRoot.path + ' not found!'
                     continue
                 }
                 jars = project.fileTree(mRoot) {
@@ -87,13 +87,13 @@ class ExplodedHelper {
             }
             if ('jar'.equals(artifact.type)) {
                 if (!artifact.file.exists()) {
-                    println 'vigi-->[warning]' + artifact.file.path + ' not found!'
+                    println 'fat-aar-->[warning]' + artifact.file.path + ' not found!'
                     continue
                 }
                 jars = project.files(artifact.file)
             }
             for (jar in jars) {
-                println 'vigi-->copy classes from: ' + jar
+                println 'fat-aar-->copy classes from: ' + jar
                 project.copy {
                     from project.zipTree(jar)
                     into folderOut

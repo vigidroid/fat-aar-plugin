@@ -44,6 +44,7 @@
 }
 
 # keep whatever we like
-# -keep class com.google.** {*;}
--keep class me.vigi.fataar.** {*;}
+# -keep class com.google.**
+# -keep class me.vigi.fataar.**
 # -keep class rx.**
+# -keep class com.android.volley.**

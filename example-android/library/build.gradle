@@ -1,6 +1,8 @@
 apply plugin: 'com.android.library'
 apply plugin: 'me.vigi.fat-aar'
 
+group 'me.vigi.fat-aar'
+version "1.0"
 android {
     compileSdkVersion 25
     buildToolsVersion "25.0.2"
@@ -9,7 +11,7 @@ android {
         minSdkVersion 9
         targetSdkVersion 25
         versionCode 1
-        versionName "1.0"
+        versionName project.version
     }
     buildTypes {
         release {
@@ -43,10 +45,14 @@ dependencies {
     compile 'com.squareup.okhttp3:okhttp:3.6.0'
 }
 
-// publish debug: gradlew clean :library:assembleDebug :library:publish
-// publish release: gradlew clean :library:assembleRelease :library:publish
-task publish(type: Copy) {
-    from('build/outputs/aar')
-    into('../app/libs')
-    rename{'library.aar'}
+apply plugin: 'maven'
+uploadArchives {
+    repositories {
+        mavenDeployer {
+            pom.groupId = project.group
+            pom.artifactId = 'demo.lib'
+            pom.version = project.version
+            repository(url: uri('../../repo'))
+        }
+    }
 }

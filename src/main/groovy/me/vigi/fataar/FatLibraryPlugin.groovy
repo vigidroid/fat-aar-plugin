@@ -25,7 +25,6 @@ import org.gradle.api.tasks.TaskState
  * 11.configuration with extension
  * 12.aidl merge?
  * 13.other gradle version and android plugin version support
- * 14.support compile project(aar, jar)
  * 15.duplicate class check
  * 17.design of configuration. refer to, into libs or classes, make embed more flexible to each variant like
  *    that android gradle plugin does, and combination of the prior
@@ -41,14 +40,21 @@ class FatLibraryPlugin implements Plugin<Project> {
 
     @Override
     void apply(Project project) {
-        // todo android gradle plugin check
         this.project = project
+        checkAndroidPlugin()
         createConfiguration()
         project.afterEvaluate {
             resolveArtifacts()
             project.android.libraryVariants.all { variant ->
                 processVariant(variant)
             }
+        }
+    }
+
+    private void checkAndroidPlugin() {
+        if (!project.plugins.hasPlugin('com.android.library')) {
+            throw new ProjectConfigurationException('fat-aar-plugin must be applied in project that' +
+                    ' has android library plugin!', null)
         }
     }
 
@@ -94,7 +100,7 @@ class FatLibraryPlugin implements Plugin<Project> {
             if ('aar'.equals(artifact.type) || 'jar'.equals(artifact.type)) {
                 println 'fat-aar-->[embed detected][' + artifact.type + ']' + artifact.moduleVersion.id
             } else {
-                throw new ProjectConfigurationException('Only support embed .aar and .jar dependencies!', null)
+                throw new ProjectConfigurationException('Only support embed aar and jar dependencies!', null)
             }
             set.add(artifact)
         }
@@ -103,7 +109,7 @@ class FatLibraryPlugin implements Plugin<Project> {
 
     private void processVariant(variant) {
         if (variant.buildType.isMinifyEnabled()) {
-            def javacTask = project.tasks.findByPath('compile' + variant.name.capitalize() + 'JavaWithJavac')
+            Task javacTask = variant.getJavaCompile()
             if (javacTask == null) {
                 return
             }
@@ -112,7 +118,7 @@ class FatLibraryPlugin implements Plugin<Project> {
                 ExplodedHelper.processIntoClasses(project, artifacts, dustDir)
             }
         } else {
-            def prepareTask = project.tasks.findByPath('prepare' + variant.name.capitalize() + 'Dependencies')
+            Task prepareTask = project.tasks.findByPath('prepare' + variant.name.capitalize() + 'Dependencies')
             if (prepareTask == null) {
                 return
             }

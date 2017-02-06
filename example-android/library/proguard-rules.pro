@@ -48,3 +48,9 @@
 # -keep class me.vigi.fataar.**
 # -keep class rx.**
 # -keep class com.android.volley.**
+
+# get rid of all duplicate notes
+-dontnote me.vigi.fataar.demo.**
+-dontnote com.google.**
+-dontnote com.android.volley.**
+-dontnote rx.**

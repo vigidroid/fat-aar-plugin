@@ -1,33 +1,51 @@
 # fat-aar-plugin
-[WIP] a gradle plugin that helps to output fat aar from android library
+[WIP] This is a gradle plugin that helps to output fat aar from android library.
 
-## Apply Plugin
+It's inspired by [android-fat-aar](https://github.com/adwiv/android-fat-aar). And intent to make more flexible and easy-to-use.
 
-add classpath to your root build script file:
+It's convenient to **sdk developer**(developer that provide a single aar library).
 
-    buildscript {
-        dependencies {
-            classpath 'com.android.tools.build:gradle:xxx'
-            classpath 'me.vigi:fat-aar-plugin:0.0.1'
-        }
+## Getting Started
+
+#### Step 1: Apply plugin
+
+Add snippet below to your root build script file:
+
+```gradle
+buildscript {
+    dependencies {
+        classpath 'com.android.tools.build:gradle:xxx'
+        classpath 'me.vigi:fat-aar-plugin:0.0.1'
     }
+}
+```
 
-In the `build.gradle` of your android library, add this:
+Add snippet below to the `build.gradle` of your android library:
 
-    apply plugin: 'me.vigi.fat-aar'
+```gradle
+apply plugin: 'me.vigi.fat-aar'
+```
 
-## Usage
+#### Step 2: Embed dependencies
 
 change `compile` to `embed` while you want to embed the dependency in the library. Like this:
 
-    dependencies {
-      embed project(':aar-lib')
-      embed 'com.google.guava:guava:20.0'
-      embed 'com.android.volley:volley:1.0.0'
-      
-      compile 'com.squareup.okhttp3:okhttp:3.6.0'
-    }
+```gradle
+dependencies {
+    // aar project
+    embed project(':aar-lib')
+    // java project
+    embed project(':java-lib')
+    // java dependency
+    embed 'com.google.guava:guava:20.0'
+    // aar dependency
+    embed 'com.android.volley:volley:1.0.0'
+  
+    // other dependencies you don't want to embed in
+    compile 'com.squareup.okhttp3:okhttp:3.6.0'
+}
+```
 
-## Thanks to
+## Known Defects or Issues
 
-[android-fat-aar](https://github.com/adwiv/android-fat-aar)
+* To aar-type dependency, only jar file in aar bundle is packaged. More entries will be supported with high priority. See [anatomy of an aar file](https://developer.android.com/studio/projects/android-library.html#aar-contents)

@@ -84,10 +84,10 @@ class FatLibraryPlugin implements Plugin<Project> {
             @Override
             void afterExecute(Task task, TaskState state) {
                 task.inputs.files.each {
-                    println '    input=' + it
+//                    println '    input=' + it
                 }
                 task.outputs.files.each {
-                    println '    output=' + it
+//                    println '    output=' + it
                 }
             }
         })

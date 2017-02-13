@@ -3,8 +3,8 @@
 buildscript {
     repositories {
         jcenter()
-        maven() {
-            url uri('../repo')
+        maven {
+            url  "http://dl.bintray.com/vigidroid/maven" 
         }
     }
     dependencies {

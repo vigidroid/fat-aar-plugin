@@ -15,7 +15,6 @@ import org.apache.commons.lang.StringUtils;
 
 import java.util.List;
 
-import me.vigi.fataar.demo.aarLib.AarLibActivity;
 import me.vigi.fataar.demo.javaLib.JavaLibClass;
 import rx.Observable;
 import rx.android.schedulers.AndroidSchedulers;
@@ -75,7 +74,7 @@ public class LibActivity extends Activity {
 
     public void onButtonClick(View view) {
         // use aar-lib
-        mContentText.append("Have aar-lib(project)\n");
-        startActivity(new Intent(this, AarLibActivity.class));
+//        mContentText.append("Have aar-lib(project)\n");
+//        startActivity(new Intent(this, AarLibActivity.class));
     }
 }

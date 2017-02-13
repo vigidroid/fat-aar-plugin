@@ -1,0 +1,80 @@
+apply plugin: 'maven'
+apply plugin: 'com.jfrog.bintray'
+
+def projectDesc = 'This is a gradle plugin that helps to output fat aar from android library.'
+def projectGitUrl = 'https://github.com/Vigi0303/fat-aar-plugin'
+def projectScmConnection = 'scm:git@github.com:Vigi0303/fat-aar-plugin.git'
+def projectIssueUrl = 'https://github.com/Vigi0303/fat-aar-plugin/issues'
+
+install {
+    repositories {
+        mavenInstaller {
+            pom.project {
+                groupId GROUP
+                artifactId ARTIFACT_ID
+                version VERSION_NAME
+
+                name 'fat aar plugin'
+                description projectDesc
+                url projectGitUrl
+
+                scm {
+                    url projectGitUrl
+                    connection projectScmConnection
+                    developerConnection projectScmConnection
+                }
+
+                developers {
+                    developer {
+                        id 'vigidroid'
+                        name 'Vigi'
+                        email 'vigidroid@gmail.com'
+                    }
+                }
+            }
+        }
+    }
+}
+
+//uploadArchives {
+//    repositories {
+//        mavenDeployer {
+//            repository(url: uri('repo'))
+//        }
+//    }
+//}
+
+task sourcesJar(type: Jar) {
+    classifier = 'sources'
+    group BasePlugin.BUILD_GROUP
+    description = 'Assembles a jar archive containing the main sources of this project.'
+    from sourceSets.main.allSource
+}
+
+task javadocJar(type: Jar) {
+    classifier = 'javadoc'
+    group BasePlugin.BUILD_GROUP
+    description = 'Assembles a jar archive containing the generated Javadoc API documentation of this project.'
+    from groovydoc
+}
+
+artifacts {
+    archives sourcesJar
+    archives javadocJar
+}
+
+bintray {
+    user = project.hasProperty('bintrayUser') ? project.property('bintrayUser') : System.getenv('BINTRAY_USER')
+    key = project.hasProperty('bintrayApiKey') ? project.property('bintrayApiKey') : System.getenv('BINTRAY_API_KEY')
+    configurations = ['archives']
+    pkg {
+        repo = 'maven'
+        name = project.name
+        desc = projectDesc
+        websiteUrl = projectGitUrl
+        vcsUrl = projectGitUrl
+        issueTrackerUrl = projectIssueUrl
+        licenses = ['MIT']
+        labels = ['gradle-plugin', 'android']
+    }
+}

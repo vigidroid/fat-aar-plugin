@@ -1,7 +1,7 @@
 # fat-aar-plugin
 [WIP] This is a gradle plugin that helps to output fat aar from android library.
 
-It's inspired by [android-fat-aar](https://github.com/adwiv/android-fat-aar). And intent to make more flexible and easy-to-use.
+It's inspired by [android-fat-aar](https://github.com/adwiv/android-fat-aar). And intent to make more flexible and functional.
 
 It's convenient to **sdk developer**(developer that provide a single aar library).
 
@@ -13,6 +13,11 @@ Add snippet below to your root build script file:
 
 ```gradle
 buildscript {
+    repositories {
+        maven {
+            url  "http://dl.bintray.com/vigidroid/maven"
+        }
+    }
     dependencies {
         classpath 'com.android.tools.build:gradle:xxx'
         classpath 'me.vigi:fat-aar-plugin:0.0.1'
@@ -46,6 +51,11 @@ dependencies {
 }
 ```
 
+**More usage see [example](./example-android).**
+
 ## Known Defects or Issues
 
 * To aar-type dependency, only jar file in aar bundle is packaged. More entries will be supported with high priority. See [anatomy of an aar file](https://developer.android.com/studio/projects/android-library.html#aar-contents)
+
+## Thanks
+[android-fat-aar](https://github.com/adwiv/android-fat-aar)

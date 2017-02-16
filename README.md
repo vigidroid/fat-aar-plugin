@@ -1,4 +1,7 @@
 # fat-aar-plugin
+
+[ ![Download](https://api.bintray.com/packages/vigidroid/maven/fat-aar-plugin/images/download.svg) ](https://bintray.com/vigidroid/maven/fat-aar-plugin/_latestVersion)
+
 [WIP] This is a gradle plugin that helps to output fat aar from android library.
 
 It's inspired by [android-fat-aar](https://github.com/adwiv/android-fat-aar). And intent to make more flexible and functional.
@@ -20,7 +23,7 @@ buildscript {
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:xxx'
-        classpath 'me.vigi:fat-aar-plugin:0.0.1'
+        classpath 'me.vigi:fat-aar-plugin:0.1.1'
     }
 }
 ```
@@ -59,7 +62,7 @@ AAR is a file format for android library.
 The file itself is a zip file that containing useful stuff in android.
 See [anatomy of an aar file here](https://developer.android.com/studio/projects/android-library.html#aar-contents).
 
-**support list:**
+**support list for now:**
 
 - [ ] manifest merge
 - [x] classes jar and external jars merge

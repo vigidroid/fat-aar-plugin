@@ -16,7 +16,6 @@ import org.gradle.api.artifacts.ResolvedArtifact
  * 3.manifest merge
  * 4.res merge
  * 5.R.txt merge
- * 6.assets merge
  * 7.so merge
  * 8.proguard.txt merge
  * 9.lint.jar merge
@@ -113,8 +112,14 @@ class FatLibraryPlugin implements Plugin<Project> {
         // merge assets
         // AaptOptions.setIgnoreAssets and AaptOptions.setIgnoreAssetsPattern will work as normal
         Task assetsTask = variant.getMergeAssets()
-//        assetsTask.doFirst {
-//            android.sourceSets.main.assets.srcDir()
-//        }
+        assetsTask.doFirst {
+            for (artifact in artifacts) {
+                if (!'aar'.equals(artifact.type)) {
+                    continue
+                }
+                AndroidArchiveLibrary archiveLibrary = new AndroidArchiveLibrary(project, artifact)
+                project.android.sourceSets.main.assets.srcDir(archiveLibrary.assetsFolder)
+            }
+        }
     }
 }

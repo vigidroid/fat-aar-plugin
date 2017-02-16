@@ -21,7 +21,7 @@ android {
 
 dependencies {
     // aar project
-//    embed project(':aar-lib')
+    embed project(':aar-lib')
     // jar project
     embed project(':java-lib')
 

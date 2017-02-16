@@ -25,31 +25,20 @@ class ExplodedHelper {
     static void processIntoJars(Project project, Collection<ResolvedArtifact> artifacts, File folderOut) {
         for (artifact in artifacts) {
             if ('aar'.equals(artifact.type)) {
-                def aarRoot = project.file(project.buildDir.path + '/intermediates' + '/exploded-aar')
-                def mid = artifact.moduleVersion.id
-                def mRoot = project.file(aarRoot.path + '/' + mid.group + '/' + mid.name + '/' + mid.version)
-                if (!mRoot.exists()) {
-                    println 'fat-aar-->[warning]' + mRoot.path + ' not found!'
+                AndroidArchiveLibrary archiveLibrary = new AndroidArchiveLibrary(project, artifact)
+                if (!archiveLibrary.rootFolder.exists()) {
+                    println 'fat-aar-->[warning]' + archiveLibrary.rootFolder + ' not found!'
                     continue
                 }
-                println 'fat-aar-->copy aar from: ' + mRoot
-                def prefix = mid.name + '-' + mid.version
+                println 'fat-aar-->copy aar from: ' + archiveLibrary.rootFolder
+                def prefix = archiveLibrary.name + '-' + archiveLibrary.version
                 project.copy {
-                    from("$mRoot.path/jars/classes.jar")
+                    from(archiveLibrary.classesJarFile)
                     into folderOut
                     rename { prefix + '.jar' }
                 }
                 project.copy {
-                    from("$mRoot.path/jars") {
-                        include '*.jar'
-                        exclude 'classes.jar'
-                    }
-                    from("$mRoot.path/jars/libs") {
-                        include '*.jar'
-                    }
-                    from("$mRoot.path/libs") {
-                        include '*.jar'
-                    }
+                    from(archiveLibrary.localJars)
                     into folderOut
                     rename { prefix + '-' + it }
                 }
@@ -69,21 +58,15 @@ class ExplodedHelper {
     }
 
     static void processIntoClasses(Project project, Collection<ResolvedArtifact> artifacts, File folderOut) {
-        def aarRoot = project.file(project.buildDir.path + '/intermediates' + '/exploded-aar')
         for (artifact in artifacts) {
             FileCollection jars = null
             if ('aar'.equals(artifact.type)) {
-                def mid = artifact.moduleVersion.id
-                def mRoot = project.file(aarRoot.path + '/' + mid.group + '/' + mid.name + '/' + mid.version)
-                if (!mRoot.exists()) {
-                    println 'fat-aar-->[warning]' + mRoot.path + ' not found!'
+                AndroidArchiveLibrary archiveLibrary = new AndroidArchiveLibrary(project, artifact)
+                if (!archiveLibrary.rootFolder.exists()) {
+                    println 'fat-aar-->[warning]' + archiveLibrary.rootFolder + ' not found!'
                     continue
                 }
-                jars = project.fileTree(mRoot) {
-                    include 'jars/*.jar'
-                    include 'jars/libs/*.jar'
-                    include 'libs/*.jar'
-                }
+                jars = project.files(archiveLibrary.classesJarFile, archiveLibrary.localJars)
             }
             if ('jar'.equals(artifact.type)) {
                 if (!artifact.file.exists()) {

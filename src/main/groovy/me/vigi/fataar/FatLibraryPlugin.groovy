@@ -8,8 +8,6 @@ import org.gradle.api.artifacts.Configuration
 import org.gradle.api.artifacts.DependencyResolutionListener
 import org.gradle.api.artifacts.ResolvableDependencies
 import org.gradle.api.artifacts.ResolvedArtifact
-import org.gradle.api.execution.TaskExecutionListener
-import org.gradle.api.tasks.TaskState
 
 /**
  * TODO
@@ -76,21 +74,6 @@ class FatLibraryPlugin implements Plugin<Project> {
             @Override
             void afterResolve(ResolvableDependencies resolvableDependencies) {}
         })
-        // todo for testing and remove in future
-        project.gradle.addListener(new TaskExecutionListener() {
-            @Override
-            void beforeExecute(Task task) {}
-
-            @Override
-            void afterExecute(Task task, TaskState state) {
-                task.inputs.files.each {
-//                    println '    input=' + it
-                }
-                task.outputs.files.each {
-//                    println '    output=' + it
-                }
-            }
-        })
     }
 
     private void resolveArtifacts() {
@@ -127,5 +110,11 @@ class FatLibraryPlugin implements Plugin<Project> {
                 ExplodedHelper.processIntoJars(project, artifacts, dustDir)
             }
         }
+        // merge assets
+        // AaptOptions.setIgnoreAssets and AaptOptions.setIgnoreAssetsPattern will work as normal
+        Task assetsTask = variant.getMergeAssets()
+//        assetsTask.doFirst {
+//            android.sourceSets.main.assets.srcDir()
+//        }
     }
 }

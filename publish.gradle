@@ -7,42 +7,32 @@ def projectScmConnection = 'scm:git@github.com:Vigi0303/fat-aar-plugin.git'
 def projectIssueUrl = 'https://github.com/Vigi0303/fat-aar-plugin/issues'
 
 install {
-    repositories {
-        mavenInstaller {
-            pom.project {
-                groupId GROUP
-                artifactId ARTIFACT_ID
-                version VERSION_NAME
+    repositories.mavenInstaller {
+        pom.groupId = GROUP
+        pom.artifactId = ARTIFACT_ID
+        pom.version = VERSION_NAME
 
-                name 'fat aar plugin'
-                description projectDesc
+        pom.project {
+            name 'fat aar plugin'
+            description projectDesc
+            url projectGitUrl
+
+            scm {
                 url projectGitUrl
+                connection projectScmConnection
+                developerConnection projectScmConnection
+            }
 
-                scm {
-                    url projectGitUrl
-                    connection projectScmConnection
-                    developerConnection projectScmConnection
-                }
-
-                developers {
-                    developer {
-                        id 'vigidroid'
-                        name 'Vigi'
-                        email 'vigidroid@gmail.com'
-                    }
+            developers {
+                developer {
+                    id 'vigidroid'
+                    name 'Vigi'
+                    email 'vigidroid@gmail.com'
                 }
             }
         }
     }
 }
-
-//uploadArchives {
-//    repositories {
-//        mavenDeployer {
-//            repository(url: uri('repo'))
-//        }
-//    }
-//}
 
 task sourcesJar(type: Jar) {
     classifier = 'sources'

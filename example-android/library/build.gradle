@@ -55,3 +55,18 @@ uploadArchives {
         }
     }
 }
+
+project.gradle.addListener(new TaskExecutionListener() {
+            @Override
+            void beforeExecute(Task task) {}
+
+            @Override
+            void afterExecute(Task task, TaskState state) {
+                task.inputs.files.each {
+                    println '    input=' + it
+                }
+                task.outputs.files.each {
+                    println '    output=' + it
+                }
+            }
+        })

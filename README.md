@@ -53,9 +53,29 @@ dependencies {
 
 **More usage see [example](./example-android).**
 
+## About AAR File
+
+AAR is a file format for android library.
+The file itself is a zip file that containing useful stuff in android.
+See [anatomy of an aar file here](https://developer.android.com/studio/projects/android-library.html#aar-contents).
+
+**support list:**
+
+- [ ] manifest merge
+- [x] classes jar and external jars merge
+- [ ] res merge
+- [ ] R.txt merge
+- [x] assets merge
+- [x] jni libs merge
+- [ ] proguard.txt merge
+- [ ] lint.jar merge
+- [ ] aidl merge?
+- [ ] public.txt merge?
+
 ## Known Defects or Issues
 
-* To aar-type dependency, only jar file in aar bundle is packaged. More entries will be supported with high priority. See [anatomy of an aar file](https://developer.android.com/studio/projects/android-library.html#aar-contents)
+* Produce lots of(maybe) `Note: duplicate definition of library class`, while proguard is on. A workaround is to add `-dontnote` in `proguard-rules.pro`.
+* Something more is welcomed
 
 ## Thanks
 [android-fat-aar](https://github.com/adwiv/android-fat-aar)

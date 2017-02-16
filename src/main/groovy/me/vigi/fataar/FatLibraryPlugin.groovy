@@ -11,17 +11,9 @@ import org.gradle.api.artifacts.ResolvedArtifact
 
 /**
  * TODO
- * 1.into classes, "Note: duplicate definition of library class", when proguard
  * 2.minSdkVersion check(done by processDebugAndroidTestManifest??)
- * 3.manifest merge
- * 4.res merge
- * 5.R.txt merge
- * 8.proguard.txt merge
- * 9.lint.jar merge
  * 11.configuration with extension
- * 12.aidl merge?
  * 13.other gradle version and android plugin version support
- * 15.duplicate class check
  * 17.design of configuration. refer to, into libs or classes, make embed more flexible to each variant like
  *    that android gradle plugin does, and combination of the prior
  *

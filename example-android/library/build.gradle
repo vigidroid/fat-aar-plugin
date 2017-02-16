@@ -17,6 +17,7 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+    defaultPublishConfig 'debug'
 }
 
 dependencies {
@@ -36,6 +37,8 @@ dependencies {
     embed 'io.reactivex:rxandroid:1.2.1'
     // jar, no dependency
     embed 'io.reactivex:rxjava:1.2.5'
+    // aar, minsdk=9, has res, has proguard.txt, has R.txt, has jni
+    embed 'pl.droidsonroids.gif:android-gif-drawable:1.2.5'
 
     // jar file
     compile files('libs/commons-lang-2.6.jar')

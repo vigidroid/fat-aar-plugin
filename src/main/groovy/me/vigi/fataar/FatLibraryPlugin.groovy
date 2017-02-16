@@ -16,7 +16,6 @@ import org.gradle.api.artifacts.ResolvedArtifact
  * 3.manifest merge
  * 4.res merge
  * 5.R.txt merge
- * 7.so merge
  * 8.proguard.txt merge
  * 9.lint.jar merge
  * 11.configuration with extension
@@ -92,21 +91,19 @@ class FatLibraryPlugin implements Plugin<Project> {
     private void processVariant(variant) {
         if (variant.buildType.isMinifyEnabled()) {
             Task javacTask = variant.getJavaCompile()
-            if (javacTask == null) {
-                return
-            }
-            javacTask.doLast {
-                def dustDir = project.file(project.buildDir.path + '/intermediates/classes/' + variant.name)
-                ExplodedHelper.processIntoClasses(project, artifacts, dustDir)
+            if (javacTask) {
+                javacTask.doLast {
+                    def dustDir = project.file(project.buildDir.path + '/intermediates/classes/' + variant.name)
+                    ExplodedHelper.processIntoClasses(project, artifacts, dustDir)
+                }
             }
         } else {
             Task prepareTask = project.tasks.findByPath('prepare' + variant.name.capitalize() + 'Dependencies')
-            if (prepareTask == null) {
-                return
-            }
-            prepareTask.doLast {
-                def dustDir = project.file(project.buildDir.path + '/intermediates/bundles/' + variant.name + '/libs')
-                ExplodedHelper.processIntoJars(project, artifacts, dustDir)
+            if (prepareTask) {
+                prepareTask.doLast {
+                    def dustDir = project.file(project.buildDir.path + '/intermediates/bundles/' + variant.name + '/libs')
+                    ExplodedHelper.processIntoJars(project, artifacts, dustDir)
+                }
             }
         }
         // merge assets
@@ -118,7 +115,22 @@ class FatLibraryPlugin implements Plugin<Project> {
                     continue
                 }
                 AndroidArchiveLibrary archiveLibrary = new AndroidArchiveLibrary(project, artifact)
+                // the source set here should be main or variant?
                 project.android.sourceSets.main.assets.srcDir(archiveLibrary.assetsFolder)
+            }
+        }
+        // merge jniLibs
+        Task mergeJniLibsTask = project.tasks.findByPath('merge' + variant.name.capitalize() + 'JniLibFolders')
+        if (mergeJniLibsTask) {
+            mergeJniLibsTask.doFirst {
+                for (artifact in artifacts) {
+                    if (!'aar'.equals(artifact.type)) {
+                        continue
+                    }
+                    AndroidArchiveLibrary archiveLibrary = new AndroidArchiveLibrary(project, artifact)
+                    // the source set here should be main or variant?
+                    project.android.sourceSets.main.jniLibs.srcDir(archiveLibrary.jniFolder)
+                }
             }
         }
     }

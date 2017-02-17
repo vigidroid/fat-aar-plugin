@@ -67,7 +67,7 @@ See [anatomy of an aar file here](https://developer.android.com/studio/projects/
 - [ ] manifest merge
 - [x] classes jar and external jars merge
 - [ ] res merge
-- [ ] R.txt merge
+- [x] R.txt merge
 - [x] assets merge
 - [x] jni libs merge
 - [ ] proguard.txt merge

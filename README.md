@@ -78,6 +78,7 @@ See [anatomy of an aar file here](https://developer.android.com/studio/projects/
 ## Known Defects or Issues
 
 * Produce lots of(maybe) `Note: duplicate definition of library class`, while proguard is on. A workaround is to add `-dontnote` in `proguard-rules.pro`.
+* Add minSdkVersion check in task `CheckManifest`. Note that it's done by `processDebugAndroidTestManifest` while clicking gradle sync.
 * Something more is welcomed
 
 ## Thanks

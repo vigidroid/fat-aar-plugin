@@ -47,9 +47,16 @@ class FatLibraryPlugin implements Plugin<Project> {
             @Override
             void beforeResolve(ResolvableDependencies resolvableDependencies) {
                 embedConf.dependencies.each { dependency ->
-                    // use provided instead of compile to prune node dependency in
-                    // pom file when upload aar library archives.
-                    // but I have no idea whether have any side effect
+                    /**
+                     * use provided instead of compile.
+                     * advantage:
+                     *   1. prune dependency node in generated pom file when upload aar library archives.
+                     *   2. make invisible to the android application module, thus to avoid some duplicated processes.
+                     * side effect:
+                     *   1. incorrect R.txt in bundle. I fixed it by another way.
+                     *   2. loss R.class in intermediates\classes\**\
+                     *   3. any other...
+                     */
                     project.dependencies.add('provided', dependency)
                 }
                 project.gradle.removeListener(this)
@@ -102,7 +109,7 @@ class FatLibraryPlugin implements Plugin<Project> {
                 }
                 AndroidArchiveLibrary archiveLibrary = new AndroidArchiveLibrary(project, artifact)
                 // the source set here should be main or variant?
-                project.android.sourceSets.main.assets.srcDir(archiveLibrary.assetsFolder)
+                project.android.sourceSets."main".assets.srcDir(archiveLibrary.assetsFolder)
             }
         }
         // merge jniLibs
@@ -115,7 +122,29 @@ class FatLibraryPlugin implements Plugin<Project> {
                     }
                     AndroidArchiveLibrary archiveLibrary = new AndroidArchiveLibrary(project, artifact)
                     // the source set here should be main or variant?
-                    project.android.sourceSets.main.jniLibs.srcDir(archiveLibrary.jniFolder)
+                    project.android.sourceSets."main".jniLibs.srcDir(archiveLibrary.jniFolder)
+                }
+            }
+        }
+        /**
+         * merge R.txt(actually is to fix issue caused by provided configuration)
+         *
+         * The overlay order will be change, but has nothing wrong with the output aar for now, so I ignore it.
+         *
+         * Here I use "variant.name" instead of "main" to avoid build exception: Duplicate resources,
+         * but I can't prevent from it. When someone encounters this,
+         * adding "android.disableResourceValidation=true" to "gradle.properties" is the workaround.
+         */
+        Task mergeResourcesTask = variant.getMergeResources()
+        if (mergeResourcesTask) {
+            mergeResourcesTask.doFirst {
+                for (artifact in artifacts) {
+                    if (!'aar'.equals(artifact.type)) {
+                        continue
+                    }
+                    AndroidArchiveLibrary archiveLibrary = new AndroidArchiveLibrary(project, artifact)
+                    // the source set here should be main or variant?
+                    project.android.sourceSets."${variant.name}".res.srcDir(archiveLibrary.resFolder)
                 }
             }
         }

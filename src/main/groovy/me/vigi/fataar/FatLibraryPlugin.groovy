@@ -10,12 +10,6 @@ import org.gradle.api.artifacts.ResolvableDependencies
 import org.gradle.api.artifacts.ResolvedArtifact
 
 /**
- * TODO
- * 2.minSdkVersion check(done by processDebugAndroidTestManifest??)
- * 11.configuration with extension
- * 13.other gradle version and android plugin version support
- * 17.design of configuration. refer to, into libs or classes, make embed more flexible to each variant like
- *    that android gradle plugin does, and combination of the prior
  *
  * Created by Vigi on 2017/1/14.
  */
@@ -85,7 +79,7 @@ class FatLibraryPlugin implements Plugin<Project> {
             Task javacTask = variant.getJavaCompile()
             if (javacTask) {
                 javacTask.doLast {
-                    def dustDir = project.file(project.buildDir.path + '/intermediates/classes/' + variant.name)
+                    def dustDir = project.file(project.buildDir.path + '/intermediates/classes/' + variant.dirName)
                     ExplodedHelper.processIntoClasses(project, artifacts, dustDir)
                 }
             }
@@ -93,7 +87,7 @@ class FatLibraryPlugin implements Plugin<Project> {
             Task prepareTask = project.tasks.findByPath('prepare' + variant.name.capitalize() + 'Dependencies')
             if (prepareTask) {
                 prepareTask.doLast {
-                    def dustDir = project.file(project.buildDir.path + '/intermediates/bundles/' + variant.name + '/libs')
+                    def dustDir = project.file(project.buildDir.path + '/intermediates/bundles/' + variant.dirName + '/libs')
                     ExplodedHelper.processIntoJars(project, artifacts, dustDir)
                 }
             }

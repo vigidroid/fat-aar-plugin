@@ -23,7 +23,7 @@ buildscript {
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:xxx'
-        classpath 'me.vigi:fat-aar-plugin:0.1.2'
+        classpath 'me.vigi:fat-aar-plugin:0.1.3'
     }
 }
 ```

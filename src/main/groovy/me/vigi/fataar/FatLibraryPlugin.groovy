@@ -82,6 +82,7 @@ class FatLibraryPlugin implements Plugin<Project> {
     }
 
     private void processVariant(variant) {
+        Task prepareTask = project.tasks.findByPath('prepare' + variant.name.capitalize() + 'Dependencies')
         if (variant.buildType.isMinifyEnabled()) {
             Task javacTask = variant.getJavaCompile()
             if (javacTask) {
@@ -91,7 +92,6 @@ class FatLibraryPlugin implements Plugin<Project> {
                 }
             }
         } else {
-            Task prepareTask = project.tasks.findByPath('prepare' + variant.name.capitalize() + 'Dependencies')
             if (prepareTask) {
                 prepareTask.doLast {
                     def dustDir = project.file(project.buildDir.path + '/intermediates/bundles/' + variant.dirName + '/libs')
@@ -129,23 +129,34 @@ class FatLibraryPlugin implements Plugin<Project> {
         /**
          * merge R.txt(actually is to fix issue caused by provided configuration)
          *
-         * The overlay order will be change, but has nothing wrong with the output aar for now, so I ignore it.
+         * The overlay order will be changed, but has nothing effect on the output aar for now, so I ignore it.
          *
          * Here I use "variant.name" instead of "main" to avoid build exception: Duplicate resources,
          * but I can't prevent from it. When someone encounters this,
          * adding "android.disableResourceValidation=true" to "gradle.properties" is the workaround.
+         *
+         * disabled
          */
-        Task mergeResourcesTask = variant.getMergeResources()
-        if (mergeResourcesTask) {
-            mergeResourcesTask.doFirst {
-                for (artifact in artifacts) {
-                    if (!'aar'.equals(artifact.type)) {
-                        continue
-                    }
-                    AndroidArchiveLibrary archiveLibrary = new AndroidArchiveLibrary(project, artifact)
-                    // the source set here should be main or variant?
-                    project.android.sourceSets."${variant.name}".res.srcDir(archiveLibrary.resFolder)
+//        Task mergeResourcesTask = variant.getMergeResources()
+//        if (mergeResourcesTask) {
+//            mergeResourcesTask.doFirst {
+//                for (artifact in artifacts) {
+//                    if (!'aar'.equals(artifact.type)) {
+//                        continue
+//                    }
+//                    AndroidArchiveLibrary archiveLibrary = new AndroidArchiveLibrary(project, artifact)
+//                    // the source set here should be main or variant?
+//                    project.android.sourceSets."${variant.name}".res.srcDir(archiveLibrary.resFolder)
+//                }
+//            }
+//        }
+        if (prepareTask) {
+            for (artifact in artifacts) {
+                if (!'aar'.equals(artifact.type)) {
+                    continue
                 }
+                AndroidArchiveLibrary archiveLibrary = new AndroidArchiveLibrary(project, artifact)
+                variant.registerResGeneratingTask(prepareTask, archiveLibrary.resFolder)
             }
         }
     }

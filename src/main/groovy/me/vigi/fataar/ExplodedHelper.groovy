@@ -30,7 +30,7 @@ class ExplodedHelper {
                     println 'fat-aar-->[warning]' + archiveLibrary.rootFolder + ' not found!'
                     continue
                 }
-                println 'fat-aar-->copy aar from: ' + archiveLibrary.rootFolder
+//                println 'fat-aar-->copy aar from: ' + archiveLibrary.rootFolder
                 def prefix = archiveLibrary.name + '-' + archiveLibrary.version
                 project.copy {
                     from(archiveLibrary.classesJarFile)
@@ -48,7 +48,7 @@ class ExplodedHelper {
                     println 'fat-aar-->[warning]' + artifact.file.path + ' not found!'
                     continue
                 }
-                println 'fat-aar-->copy jar from: ' + artifact.file
+//                println 'fat-aar-->copy jar from: ' + artifact.file
                 project.copy {
                     from(artifact.file)
                     into folderOut
@@ -76,7 +76,7 @@ class ExplodedHelper {
                 jars = project.files(artifact.file)
             }
             for (jar in jars) {
-                println 'fat-aar-->copy classes from: ' + jar
+//                println 'fat-aar-->copy classes from: ' + jar
                 project.copy {
                     from project.zipTree(jar)
                     into folderOut

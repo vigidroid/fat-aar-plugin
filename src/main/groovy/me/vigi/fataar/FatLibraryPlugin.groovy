@@ -127,37 +127,40 @@ class FatLibraryPlugin implements Plugin<Project> {
             }
         }
         /**
-         * merge R.txt(actually is to fix issue caused by provided configuration)
+         * merge R.txt(actually is to fix issue caused by provided configuration) and res
          *
-         * The overlay order will be changed, but has nothing effect on the output aar for now, so I ignore it.
+         * Here I have to inject res into "main" instead of "variant.name".
+         * To avoid the res from embed dependencies being used, once they have the same res Id with main res.
          *
-         * Here I use "variant.name" instead of "main" to avoid build exception: Duplicate resources,
-         * but I can't prevent from it. When someone encounters this,
-         * adding "android.disableResourceValidation=true" to "gradle.properties" is the workaround.
-         *
-         * disabled
+         * Now the same res Id will cause a build exception: Duplicate resources, to encourage you to change res Id.
+         * Adding "android.disableResourceValidation=true" to "gradle.properties" can do a trick to skip the exception, but is not recommended.
          */
-//        Task mergeResourcesTask = variant.getMergeResources()
-//        if (mergeResourcesTask) {
-//            mergeResourcesTask.doFirst {
-//                for (artifact in artifacts) {
-//                    if (!'aar'.equals(artifact.type)) {
-//                        continue
-//                    }
-//                    AndroidArchiveLibrary archiveLibrary = new AndroidArchiveLibrary(project, artifact)
-//                    // the source set here should be main or variant?
-//                    project.android.sourceSets."${variant.name}".res.srcDir(archiveLibrary.resFolder)
-//                }
-//            }
-//        }
-        if (prepareTask) {
-            for (artifact in artifacts) {
-                if (!'aar'.equals(artifact.type)) {
-                    continue
+        Task resourceGenTask = project.tasks.findByPath('generate' + variant.name.capitalize() + 'Resources')
+        if (resourceGenTask) {
+            resourceGenTask.doFirst {
+                for (artifact in artifacts) {
+                    if (!'aar'.equals(artifact.type)) {
+                        continue
+                    }
+                    AndroidArchiveLibrary archiveLibrary = new AndroidArchiveLibrary(project, artifact)
+                    project.android.sourceSets."main".res.srcDir(archiveLibrary.resFolder)
                 }
-                AndroidArchiveLibrary archiveLibrary = new AndroidArchiveLibrary(project, artifact)
-                variant.registerResGeneratingTask(prepareTask, archiveLibrary.resFolder)
             }
         }
+        /**
+         * merge R.txt and res.
+         *
+         * Deprecated.
+         * This will cause a warning "Source folders generated at incorrect location" when Gradle Sync
+         */
+//        if (prepareTask) {
+//            for (artifact in artifacts) {
+//                if (!'aar'.equals(artifact.type)) {
+//                    continue
+//                }
+//                AndroidArchiveLibrary archiveLibrary = new AndroidArchiveLibrary(project, artifact)
+//                variant.registerResGeneratingTask(prepareTask, archiveLibrary.resFolder)
+//            }
+//        }
     }
 }

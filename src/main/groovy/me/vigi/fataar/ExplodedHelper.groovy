@@ -10,18 +10,6 @@ import org.gradle.api.file.FileTree
  */
 class ExplodedHelper {
 
-    /**
-     * iterate over all AndroidManifest.xml to resolve aar dependencies
-     */
-    static FileTree resolveAllManifests(Project project) {
-        def explodedRoot = project.file(project.buildDir.path + '/intermediates' + '/exploded-aar')
-        def manifests = project.fileTree(explodedRoot) {
-            include '**/AndroidManifest.xml'
-            exclude '**/aapt/AndroidManifest.xml'
-        }
-        return manifests
-    }
-
     static void processIntoJars(Project project, Collection<ResolvedArtifact> artifacts, File folderOut) {
         for (artifact in artifacts) {
             if ('aar'.equals(artifact.type)) {

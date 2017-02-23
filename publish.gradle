@@ -50,7 +50,7 @@ task javadocJar(type: Jar) {
 
 artifacts {
     archives sourcesJar
-    archives javadocJar
+//    archives javadocJar
 }
 
 bintray {

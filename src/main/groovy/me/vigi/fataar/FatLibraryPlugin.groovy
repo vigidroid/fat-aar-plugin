@@ -162,5 +162,40 @@ class FatLibraryPlugin implements Plugin<Project> {
 //                variant.registerResGeneratingTask(prepareTask, archiveLibrary.resFolder)
 //            }
 //        }
+        /**
+         * merge manifest
+         *
+         * TODO process each variant.getOutputs()
+         * TODO "InvokeManifestMerger" deserve more android plugin version check
+         * TODO add setMergeReportFile
+         * TODO a better temp manifest file location
+         */
+        Class invokeManifestTaskClazz
+        try {
+            invokeManifestTaskClazz = Class.forName('com.android.build.gradle.tasks.InvokeManifestMerger')
+        } catch (ClassNotFoundException e) {
+            println 'fat-aar-->' + e.getMessage()
+            return
+        }
+        Task processManifestTask = variant.getOutputs().get(0).getProcessManifest()
+        def manifestOutput = project.file(project.buildDir.path + '/intermediates/fat-aar/' + variant.dirName + '/AndroidManifest.xml')
+        File manifestOutputBackup = processManifestTask.getManifestOutputFile()
+        processManifestTask.setManifestOutputFile(manifestOutput)
+        Task manifestsMergeTask = project.tasks.create('merge' + variant.name.capitalize() + 'Manifest', invokeManifestTaskClazz)
+        manifestsMergeTask.setVariantName(variant.name)
+        manifestsMergeTask.setMainManifestFile(manifestOutput)
+        List<File> list = new ArrayList<>()
+        for (artifact in artifacts) {
+            if (!'aar'.equals(artifact.type)) {
+                continue
+            }
+            AndroidArchiveLibrary archiveLibrary = new AndroidArchiveLibrary(project, artifact)
+            list.add(archiveLibrary.getManifest())
+        }
+        manifestsMergeTask.setSecondaryManifestFiles(list)
+        manifestsMergeTask.setOutputFile(manifestOutputBackup)
+        manifestsMergeTask.dependsOn processManifestTask
+        Task processResourcesTask = variant.getOutputs().get(0).getProcessResources()
+        processResourcesTask.dependsOn manifestsMergeTask
     }
 }

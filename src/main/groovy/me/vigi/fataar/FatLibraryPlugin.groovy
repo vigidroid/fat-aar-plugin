@@ -3,7 +3,6 @@ package me.vigi.fataar
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.ProjectConfigurationException
-import org.gradle.api.Task
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.artifacts.DependencyResolutionListener
 import org.gradle.api.artifacts.ResolvableDependencies
@@ -82,120 +81,16 @@ class FatLibraryPlugin implements Plugin<Project> {
     }
 
     private void processVariant(variant) {
-        Task prepareTask = project.tasks.findByPath('prepare' + variant.name.capitalize() + 'Dependencies')
-        if (variant.buildType.isMinifyEnabled()) {
-            Task javacTask = variant.getJavaCompile()
-            if (javacTask) {
-                javacTask.doLast {
-                    def dustDir = project.file(project.buildDir.path + '/intermediates/classes/' + variant.dirName)
-                    ExplodedHelper.processIntoClasses(project, artifacts, dustDir)
-                }
-            }
-        } else {
-            if (prepareTask) {
-                prepareTask.doLast {
-                    def dustDir = project.file(project.buildDir.path + '/intermediates/bundles/' + variant.dirName + '/libs')
-                    ExplodedHelper.processIntoJars(project, artifacts, dustDir)
-                }
-            }
-        }
-        // merge assets
-        // AaptOptions.setIgnoreAssets and AaptOptions.setIgnoreAssetsPattern will work as normal
-        Task assetsTask = variant.getMergeAssets()
-        assetsTask.doFirst {
-            for (artifact in artifacts) {
-                if (!'aar'.equals(artifact.type)) {
-                    continue
-                }
-                AndroidArchiveLibrary archiveLibrary = new AndroidArchiveLibrary(project, artifact)
-                // the source set here should be main or variant?
-                project.android.sourceSets."main".assets.srcDir(archiveLibrary.assetsFolder)
-            }
-        }
-        // merge jniLibs
-        Task mergeJniLibsTask = project.tasks.findByPath('merge' + variant.name.capitalize() + 'JniLibFolders')
-        if (mergeJniLibsTask) {
-            mergeJniLibsTask.doFirst {
-                for (artifact in artifacts) {
-                    if (!'aar'.equals(artifact.type)) {
-                        continue
-                    }
-                    AndroidArchiveLibrary archiveLibrary = new AndroidArchiveLibrary(project, artifact)
-                    // the source set here should be main or variant?
-                    project.android.sourceSets."main".jniLibs.srcDir(archiveLibrary.jniFolder)
-                }
-            }
-        }
-        /**
-         * merge R.txt(actually is to fix issue caused by provided configuration) and res
-         *
-         * Here I have to inject res into "main" instead of "variant.name".
-         * To avoid the res from embed dependencies being used, once they have the same res Id with main res.
-         *
-         * Now the same res Id will cause a build exception: Duplicate resources, to encourage you to change res Id.
-         * Adding "android.disableResourceValidation=true" to "gradle.properties" can do a trick to skip the exception, but is not recommended.
-         */
-        Task resourceGenTask = project.tasks.findByPath('generate' + variant.name.capitalize() + 'Resources')
-        if (resourceGenTask) {
-            resourceGenTask.doFirst {
-                for (artifact in artifacts) {
-                    if (!'aar'.equals(artifact.type)) {
-                        continue
-                    }
-                    AndroidArchiveLibrary archiveLibrary = new AndroidArchiveLibrary(project, artifact)
-                    project.android.sourceSets."main".res.srcDir(archiveLibrary.resFolder)
-                }
-            }
-        }
-        /**
-         * merge R.txt and res.
-         *
-         * Deprecated.
-         * This will cause a warning "Source folders generated at incorrect location" when Gradle Sync
-         */
-//        if (prepareTask) {
-//            for (artifact in artifacts) {
-//                if (!'aar'.equals(artifact.type)) {
-//                    continue
-//                }
-//                AndroidArchiveLibrary archiveLibrary = new AndroidArchiveLibrary(project, artifact)
-//                variant.registerResGeneratingTask(prepareTask, archiveLibrary.resFolder)
-//            }
-//        }
-        /**
-         * merge manifest
-         *
-         * TODO process each variant.getOutputs()
-         * TODO "InvokeManifestMerger" deserve more android plugin version check
-         * TODO add setMergeReportFile
-         * TODO a better temp manifest file location
-         */
-        Class invokeManifestTaskClazz
-        try {
-            invokeManifestTaskClazz = Class.forName('com.android.build.gradle.tasks.InvokeManifestMerger')
-        } catch (ClassNotFoundException e) {
-            println 'fat-aar-->' + e.getMessage()
-            return
-        }
-        Task processManifestTask = variant.getOutputs().get(0).getProcessManifest()
-        def manifestOutput = project.file(project.buildDir.path + '/intermediates/fat-aar/' + variant.dirName + '/AndroidManifest.xml')
-        File manifestOutputBackup = processManifestTask.getManifestOutputFile()
-        processManifestTask.setManifestOutputFile(manifestOutput)
-        Task manifestsMergeTask = project.tasks.create('merge' + variant.name.capitalize() + 'Manifest', invokeManifestTaskClazz)
-        manifestsMergeTask.setVariantName(variant.name)
-        manifestsMergeTask.setMainManifestFile(manifestOutput)
-        List<File> list = new ArrayList<>()
+        def processor = new VariantProcessor(project, variant)
         for (artifact in artifacts) {
-            if (!'aar'.equals(artifact.type)) {
-                continue
+            if ('aar'.equals(artifact.type)) {
+                AndroidArchiveLibrary archiveLibrary = new AndroidArchiveLibrary(project, artifact)
+                processor.addAndroidArchiveLibrary(archiveLibrary)
             }
-            AndroidArchiveLibrary archiveLibrary = new AndroidArchiveLibrary(project, artifact)
-            list.add(archiveLibrary.getManifest())
+            if ('jar'.equals(artifact.type)) {
+                processor.addJarFile(artifact.file)
+            }
         }
-        manifestsMergeTask.setSecondaryManifestFiles(list)
-        manifestsMergeTask.setOutputFile(manifestOutputBackup)
-        manifestsMergeTask.dependsOn processManifestTask
-        Task processResourcesTask = variant.getOutputs().get(0).getProcessResources()
-        processResourcesTask.dependsOn manifestsMergeTask
+        processor.processVariant()
     }
 }

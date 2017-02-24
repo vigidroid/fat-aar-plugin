@@ -1,6 +1,5 @@
 package me.vigi.fataar;
 
-import com.android.annotations.NonNull;
 import org.gradle.api.Project;
 import org.gradle.api.artifacts.ModuleVersionIdentifier;
 import org.gradle.api.artifacts.ResolvedArtifact;
@@ -21,7 +20,7 @@ public class AndroidArchiveLibrary {
 
     private final ResolvedArtifact mArtifact;
 
-    public AndroidArchiveLibrary(@NonNull Project project, @NonNull ResolvedArtifact artifact) {
+    public AndroidArchiveLibrary(Project project, ResolvedArtifact artifact) {
         if (!"aar".equals(artifact.getType())) {
             throw new IllegalArgumentException("artifact must be aar type!");
         }

@@ -70,7 +70,7 @@ See [anatomy of an aar file here](https://developer.android.com/studio/projects/
 - [x] R.txt merge
 - [x] assets merge
 - [x] jni libs merge
-- [ ] proguard.txt merge
+- [x] proguard.txt merge
 - [ ] lint.jar merge
 - [ ] aidl merge?
 - [ ] public.txt merge?

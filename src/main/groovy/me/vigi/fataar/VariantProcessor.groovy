@@ -30,11 +30,14 @@ class VariantProcessor {
     }
 
     public void processVariant() {
+        Task prepareTask = mProject.tasks.findByPath('prepare' + mVariant.name.capitalize() + 'Dependencies')
+
         processManifest()
-        processClassesAndJars()
+        processClassesAndJars(prepareTask)
         processResourcesAndR()
         processAssets()
         processJniLibs()
+        processProguardTxt(prepareTask)
     }
 
     /**
@@ -73,7 +76,7 @@ class VariantProcessor {
         processManifestTask.finalizedBy manifestsMergeTask
     }
 
-    private void processClassesAndJars() {
+    private void processClassesAndJars(Task prepareTask) {
         if (mVariant.buildType.isMinifyEnabled()) {
             Task javacTask = mVariant.getJavaCompile()
             if (javacTask == null) {
@@ -84,7 +87,6 @@ class VariantProcessor {
                 ExplodedHelper.processIntoClasses(mProject, mAndroidArchiveLibraries, mJarFiles, dustDir)
             }
         } else {
-            Task prepareTask = mProject.tasks.findByPath('prepare' + mVariant.name.capitalize() + 'Dependencies')
             if (prepareTask == null) {
                 return
             }
@@ -148,5 +150,19 @@ class VariantProcessor {
                 mProject.android.sourceSets."main".jniLibs.srcDir(archiveLibrary.jniFolder)
             }
         }
+    }
+
+    private void processProguardTxt(Task prepareTask) {
+        Task mergeFileTask = mProject.tasks.findByPath('merge' + mVariant.name.capitalize() + 'ProguardFiles')
+        if (mergeFileTask == null) {
+            return
+        }
+        mergeFileTask.doFirst {
+            Collection proguardFiles = mergeFileTask.getInputFiles()
+            for (archiveLibrary in mAndroidArchiveLibraries) {
+                proguardFiles.add(archiveLibrary.proguardRules)
+            }
+        }
+        mergeFileTask.dependsOn prepareTask
     }
 }

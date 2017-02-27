@@ -75,13 +75,12 @@ See [anatomy of an aar file here](https://developer.android.com/studio/projects/
 - [ ] aidl merge?
 - [ ] public.txt merge?
 
-## Notices
+## Known Defects or Issues
 
 * **Proguard note.** Produce lots of(maybe) `Note: duplicate definition of library class`, while proguard is on. A workaround is to add `-dontnote` in `proguard-rules.pro`.
-* **`minSdkVersion` check.** Add minSdkVersion check in task `CheckManifest`. Note that it's done by `processDebugAndroidTestManifest` while clicking gradle sync.
 * **The overlay order of res merge is changed:** Embedded dependency has higher priority than other dependencies.
 * **Res merge conflicts.** If the library res folder and embedded dependencies res have the same res Id(mostly `string/app_name`). A duplicate resources build exception will be thrown. To avoid res conflicts, consider using a prefix to each res Id, both in library res and aar dependencies if possible.
-* Something more is welcomed
+* More issue or defect is welcomed...
 
 ## Thanks
 [android-fat-aar](https://github.com/adwiv/android-fat-aar)

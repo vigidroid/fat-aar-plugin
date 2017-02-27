@@ -154,12 +154,15 @@ class VariantProcessor {
 
     private void processProguardTxt(Task prepareTask) {
         Task mergeFileTask = mProject.tasks.findByPath('merge' + mVariant.name.capitalize() + 'ProguardFiles')
-        if (mergeFileTask == null) {
+        if (mergeFileTask == null || prepareTask == null) {
             return
         }
         mergeFileTask.doFirst {
             Collection proguardFiles = mergeFileTask.getInputFiles()
             for (archiveLibrary in mAndroidArchiveLibraries) {
+                if (!archiveLibrary.proguardRules.exists()) {
+                    continue
+                }
                 proguardFiles.add(archiveLibrary.proguardRules)
             }
         }

@@ -21,4 +21,5 @@ dependencies {
     compile gradleApi()
     compile localGroovy()
     compile 'com.android.tools.build:gradle:2.2.3'
+    compile 'com.squareup:javapoet:1.8.0'
 }

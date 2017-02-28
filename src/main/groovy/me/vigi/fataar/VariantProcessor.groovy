@@ -35,6 +35,7 @@ class VariantProcessor {
         processManifest()
         processClassesAndJars(prepareTask)
         processResourcesAndR()
+        processRSources()
         processAssets()
         processJniLibs()
         processProguardTxt(prepareTask)
@@ -114,6 +115,18 @@ class VariantProcessor {
         resourceGenTask.doFirst {
             for (archiveLibrary in mAndroidArchiveLibraries) {
                 mProject.android.sourceSets."main".res.srcDir(archiveLibrary.resFolder)
+            }
+        }
+    }
+
+    /**
+     * generate R.java
+     */
+    private void processRSources() {
+        Task processResourcesTask = mVariant.getOutputs().get(0).getProcessResources()
+        processResourcesTask.doLast {
+            for (archiveLibrary in mAndroidArchiveLibraries) {
+                RSourceGenerator.generate(processResourcesTask.getSourceOutputDir(), archiveLibrary)
             }
         }
     }

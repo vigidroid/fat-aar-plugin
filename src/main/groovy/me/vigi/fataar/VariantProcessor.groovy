@@ -81,7 +81,7 @@ class VariantProcessor {
     }
 
     private void processClassesAndJars(Task prepareTask) {
-        if (mVariant.buildType.isMinifyEnabled()) {
+        if (mVariant.getBuildType().isMinifyEnabled()) {
             Task javacTask = mVariant.getJavaCompile()
             if (javacTask == null) {
                 // warn: can not find javaCompile task, jack compile might be on.
@@ -94,6 +94,7 @@ class VariantProcessor {
         } else {
             prepareTask.doLast {
                 def dustDir = mProject.file(mProject.buildDir.path + '/intermediates/bundles/' + mVariant.dirName + '/libs')
+//                FileUtils.cleanDirectory(dustDir)
                 ExplodedHelper.processIntoJars(mProject, mAndroidArchiveLibraries, mJarFiles, dustDir)
             }
         }
@@ -143,6 +144,9 @@ class VariantProcessor {
         if (assetsTask == null) {
             throw new RuntimeException("Can not find task in variant.getMergeAssets()!")
         }
+        for (archiveLibrary in mAndroidArchiveLibraries) {
+            assetsTask.getInputs().dir(archiveLibrary.assetsFolder)
+        }
         assetsTask.doFirst {
             for (archiveLibrary in mAndroidArchiveLibraries) {
                 // the source set here should be main or variant?
@@ -159,6 +163,9 @@ class VariantProcessor {
         Task mergeJniLibsTask = mProject.tasks.findByPath(taskPath)
         if (mergeJniLibsTask == null) {
             throw new RuntimeException("Can not find task ${taskPath}!")
+        }
+        for (archiveLibrary in mAndroidArchiveLibraries) {
+            mergeJniLibsTask.getInputs().dir(archiveLibrary.jniFolder)
         }
         mergeJniLibsTask.doFirst {
             for (archiveLibrary in mAndroidArchiveLibraries) {
@@ -177,13 +184,21 @@ class VariantProcessor {
         if (mergeFileTask == null) {
             throw new RuntimeException("Can not find task ${taskPath}!")
         }
+        for (archiveLibrary in mAndroidArchiveLibraries) {
+            File thirdProguard = archiveLibrary.proguardRules
+            if (!thirdProguard.exists()) {
+                continue
+            }
+            mergeFileTask.getInputs().file(thirdProguard)
+        }
         mergeFileTask.doFirst {
             Collection proguardFiles = mergeFileTask.getInputFiles()
             for (archiveLibrary in mAndroidArchiveLibraries) {
-                if (!archiveLibrary.proguardRules.exists()) {
+                File thirdProguard = archiveLibrary.proguardRules
+                if (!thirdProguard.exists()) {
                     continue
                 }
-                proguardFiles.add(archiveLibrary.proguardRules)
+                proguardFiles.add(thirdProguard)
             }
         }
         mergeFileTask.dependsOn prepareTask

@@ -54,3 +54,4 @@
 -dontnote com.google.**
 -dontnote com.android.volley.**
 -dontnote rx.**
+-dontnote pl.droidsonroids.gif.**

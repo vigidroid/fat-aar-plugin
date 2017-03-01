@@ -82,6 +82,13 @@ class VariantProcessor {
 
     private void processClassesAndJars(Task prepareTask) {
         if (mVariant.getBuildType().isMinifyEnabled()) {
+            for (archiveLibrary in mAndroidArchiveLibraries) {
+                File thirdProguard = archiveLibrary.proguardRules
+                if (!thirdProguard.exists()) {
+                    continue
+                }
+                mProject.android.getDefaultConfig().proguardFile(thirdProguard)
+            }
             Task javacTask = mVariant.getJavaCompile()
             if (javacTask == null) {
                 // warn: can not find javaCompile task, jack compile might be on.

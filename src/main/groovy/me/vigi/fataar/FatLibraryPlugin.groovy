@@ -52,9 +52,9 @@ class FatLibraryPlugin implements Plugin<Project> {
                      *   1. prune dependency node in generated pom file when upload aar library archives.
                      *   2. make invisible to the android application module, thus to avoid some duplicated processes.
                      * side effect:
-                     *   1. incorrect R.txt in bundle. I fixed it by another way.
-                     *   2. loss R.java that is supposed to be generated. I make it manually.
-                     *   3. proguard.txt of embedded dependency is excluded when proguard.
+                     *   1. [Fixed]incorrect R.txt in bundle. I fixed it by another way.
+                     *   2. [Fixed]loss R.java that is supposed to be generated. I make it manually.
+                     *   3. [Fixed]proguard.txt of embedded dependency is excluded when proguard.
                      *   4. any other...
                      */
                     project.dependencies.add('provided', dependency)

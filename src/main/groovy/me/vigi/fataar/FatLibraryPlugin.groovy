@@ -54,7 +54,8 @@ class FatLibraryPlugin implements Plugin<Project> {
                      * side effect:
                      *   1. incorrect R.txt in bundle. I fixed it by another way.
                      *   2. loss R.java that is supposed to be generated. I make it manually.
-                     *   3. any other...
+                     *   3. proguard.txt of embedded dependency is excluded when proguard.
+                     *   4. any other...
                      */
                     project.dependencies.add('provided', dependency)
                 }

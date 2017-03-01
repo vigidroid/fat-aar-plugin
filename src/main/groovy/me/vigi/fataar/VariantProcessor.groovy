@@ -30,7 +30,11 @@ class VariantProcessor {
     }
 
     public void processVariant() {
-        Task prepareTask = mProject.tasks.findByPath('prepare' + mVariant.name.capitalize() + 'Dependencies')
+        String taskPath = 'prepare' + mVariant.name.capitalize() + 'Dependencies'
+        Task prepareTask = mProject.tasks.findByPath(taskPath)
+        if (prepareTask == null) {
+            throw new RuntimeException("Can not find task ${taskPath}!")
+        }
 
         processManifest()
         processClassesAndJars(prepareTask)
@@ -51,13 +55,12 @@ class VariantProcessor {
      */
     private void processManifest() {
         Class invokeManifestTaskClazz = null
+        String className = 'com.android.build.gradle.tasks.InvokeManifestMerger'
         try {
-            invokeManifestTaskClazz = Class.forName('com.android.build.gradle.tasks.InvokeManifestMerger')
-        } catch (ClassNotFoundException e) {
-            println 'fat-aar-->' + e.getMessage()
-        }
+            invokeManifestTaskClazz = Class.forName(className)
+        } catch (ClassNotFoundException ignored) {}
         if (invokeManifestTaskClazz == null) {
-            return
+            throw new RuntimeException("Can not find class ${className}!")
         }
         Task processManifestTask = mVariant.getOutputs().get(0).getProcessManifest()
         def manifestOutput = mProject.file(mProject.buildDir.path + '/intermediates/fat-aar/' + mVariant.dirName + '/AndroidManifest.xml')
@@ -81,6 +84,7 @@ class VariantProcessor {
         if (mVariant.buildType.isMinifyEnabled()) {
             Task javacTask = mVariant.getJavaCompile()
             if (javacTask == null) {
+                // warn: can not find javaCompile task, jack compile might be on.
                 return
             }
             javacTask.doLast {
@@ -88,9 +92,6 @@ class VariantProcessor {
                 ExplodedHelper.processIntoClasses(mProject, mAndroidArchiveLibraries, mJarFiles, dustDir)
             }
         } else {
-            if (prepareTask == null) {
-                return
-            }
             prepareTask.doLast {
                 def dustDir = mProject.file(mProject.buildDir.path + '/intermediates/bundles/' + mVariant.dirName + '/libs')
                 ExplodedHelper.processIntoJars(mProject, mAndroidArchiveLibraries, mJarFiles, dustDir)
@@ -108,9 +109,10 @@ class VariantProcessor {
      * Adding "android.disableResourceValidation=true" to "gradle.properties" can do a trick to skip the exception, but is not recommended.
      */
     private void processResourcesAndR() {
-        Task resourceGenTask = mProject.tasks.findByPath('generate' + mVariant.name.capitalize() + 'Resources')
+        String taskPath = 'generate' + mVariant.name.capitalize() + 'Resources'
+        Task resourceGenTask = mProject.tasks.findByPath(taskPath)
         if (resourceGenTask == null) {
-            return
+            throw new RuntimeException("Can not find task ${taskPath}!")
         }
         resourceGenTask.doFirst {
             for (archiveLibrary in mAndroidArchiveLibraries) {
@@ -139,7 +141,7 @@ class VariantProcessor {
     private void processAssets() {
         Task assetsTask = mVariant.getMergeAssets()
         if (assetsTask == null) {
-            return
+            throw new RuntimeException("Can not find task in variant.getMergeAssets()!")
         }
         assetsTask.doFirst {
             for (archiveLibrary in mAndroidArchiveLibraries) {
@@ -153,9 +155,10 @@ class VariantProcessor {
      * merge jniLibs
      */
     private void processJniLibs() {
-        Task mergeJniLibsTask = mProject.tasks.findByPath('merge' + mVariant.name.capitalize() + 'JniLibFolders')
+        String taskPath = 'merge' + mVariant.name.capitalize() + 'JniLibFolders'
+        Task mergeJniLibsTask = mProject.tasks.findByPath(taskPath)
         if (mergeJniLibsTask == null) {
-            return
+            throw new RuntimeException("Can not find task ${taskPath}!")
         }
         mergeJniLibsTask.doFirst {
             for (archiveLibrary in mAndroidArchiveLibraries) {
@@ -165,10 +168,14 @@ class VariantProcessor {
         }
     }
 
+    /**
+     * merge proguard.txt
+     */
     private void processProguardTxt(Task prepareTask) {
-        Task mergeFileTask = mProject.tasks.findByPath('merge' + mVariant.name.capitalize() + 'ProguardFiles')
-        if (mergeFileTask == null || prepareTask == null) {
-            return
+        String taskPath = 'merge' + mVariant.name.capitalize() + 'ProguardFiles'
+        Task mergeFileTask = mProject.tasks.findByPath(taskPath)
+        if (mergeFileTask == null) {
+            throw new RuntimeException("Can not find task ${taskPath}!")
         }
         mergeFileTask.doFirst {
             Collection proguardFiles = mergeFileTask.getInputFiles()

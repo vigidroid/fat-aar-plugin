@@ -1,21 +1,20 @@
 package me.vigi.fataar.demo.lib;
 
 import android.app.Activity;
-import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
-import com.android.volley.toolbox.Volley;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
 
 import org.apache.commons.lang.StringUtils;
 
+import java.io.IOException;
 import java.util.List;
 
-import me.vigi.fataar.demo.javaLib.JavaLibClass;
+import pl.droidsonroids.gif.GifDrawable;
 import rx.Observable;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
@@ -38,16 +37,18 @@ public class LibActivity extends Activity {
         mButton = (Button) findViewById(R.id.lib_bt);
         mContentText = (TextView) findViewById(R.id.lib_tv);
 
-        // use volley
-        Volley.newRequestQueue(this);
-        mContentText.append("Have volley\n");
+        // use android-gif-drawable
+        try {
+            new GifDrawable("test");
+        } catch (IOException ignored) {}
+        mContentText.append("Have android-gif-drawable\n");
 
         // use guava
         Lists.newArrayList();
         mContentText.append("Have guava\n");
 
         // use java-lib
-        mContentText.append("Have java-lib(project) and output=" + JavaLibClass.plus(1, 2) + "\n");
+//        mContentText.append("Have java-lib(project) and output=" + JavaLibClass.plus(1, 2) + "\n");
 
         // use rxandroid and rxjava
         Observable.just("Have", "rxandroid", "and", "rxjava")

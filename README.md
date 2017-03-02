@@ -2,11 +2,16 @@
 
 [ ![Download](https://api.bintray.com/packages/vigidroid/maven/fat-aar-plugin/images/download.svg) ](https://bintray.com/vigidroid/maven/fat-aar-plugin/_latestVersion)
 
-[WIP] This is a gradle plugin that helps to output fat aar from android library.
+This is a gradle plugin that helps to output fat aar from android library. I am inspired by [android-fat-aar][1]. And aim to make more flexible and functional. It's convenient to **sdk developer**(developer that provide a single aar library).
 
-It's inspired by [android-fat-aar](https://github.com/adwiv/android-fat-aar). And intent to make more flexible and functional.
+It works with [the android gradle plugin][3], the android plugin's version of the development is `2.2.3`, other revision is not tested actually. Commit an issue as you encounter some compatibility.
 
-It's convenient to **sdk developer**(developer that provide a single aar library).
+Essentially, `fat-aar-plugin` makes a hack way, to collect resources, jar files and something others in embedded dependencies, into the bundled output aar. Click [here](#About-AAR-File) to know more about `AAR`.
+
+**[Features]**
+* Support embed `android library project`, `java project`, `android library and java library from maven repositories`. Local jar file is not needed to use `embed`, `compile` is enough.
+* Work fine with the original features provided by `android plugin`. Such as multi build type, product flavor, manifest placeholder, proguard... If you find something wrong, commit an issue.
+* The jar files in embedded dependencies will be bundled into `libs\` in aar. If the proguard is on, they will be bundled into `classes.jar` in aar, it means classes in dependencies will also be obfuscated.
 
 ## Getting Started
 
@@ -60,7 +65,7 @@ dependencies {
 
 AAR is a file format for android library.
 The file itself is a zip file that containing useful stuff in android.
-See [anatomy of an aar file here](https://developer.android.com/studio/projects/android-library.html#aar-contents).
+See [anatomy of an aar file here][2].
 
 **support list for now:**
 
@@ -83,4 +88,8 @@ See [anatomy of an aar file here](https://developer.android.com/studio/projects/
 * More issue or defect is welcomed...
 
 ## Thanks
-[android-fat-aar](https://github.com/adwiv/android-fat-aar)
+[android-fat-aar][1]
+
+[1]: https://github.com/adwiv/android-fat-aar
+[2]: https://developer.android.com/studio/projects/android-library.html#aar-contents
+[3]: https://developer.android.com/studio/releases/gradle-plugin.html

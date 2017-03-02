@@ -11,7 +11,7 @@ Essentially, `fat-aar-plugin` makes a hack way, to collect resources, jar files 
 **[Features]**
 * Support embed `android library project`, `java project`, `android library and java library from maven repositories`. Local jar file is not needed to use `embed`, `compile` is enough.
 * Work fine with the original features provided by `android plugin`. Such as multi build type, product flavor, manifest placeholder, proguard... If you find something wrong, commit an issue.
-* The jar files in embedded dependencies will be bundled into `libs\` in aar. If the proguard is on, they will be bundled into `classes.jar` in aar, it means classes in dependencies will also be obfuscated.
+* The jar files in embedded dependencies will be bundled into `libs\` in aar when the proguard is off. Otherwise , they will be bundled into `classes.jar` in aar, it means classes in dependencies will also be obfuscated.
 
 ## Getting Started
 

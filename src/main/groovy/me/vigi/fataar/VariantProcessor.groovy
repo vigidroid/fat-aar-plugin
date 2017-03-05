@@ -36,8 +36,12 @@ class VariantProcessor {
             throw new RuntimeException("Can not find task ${taskPath}!")
         }
 
-        processManifest()
         processClassesAndJars(prepareTask)
+
+        if (mAndroidArchiveLibraries.isEmpty()) {
+            return
+        }
+        processManifest()
         processResourcesAndR()
         processRSources()
         processAssets()

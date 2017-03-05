@@ -104,7 +104,7 @@ class VariantProcessor {
             }
         } else {
             prepareTask.doLast {
-                def dustDir = mProject.file(mProject.buildDir.path + '/intermediates/bundles/' + mVariant.dirName + '/libs')
+                def dustDir = mProject.file(AndroidPluginHelper.resolveBundleDir(mProject, mVariant).path + '/libs')
 //                FileUtils.cleanDirectory(dustDir)
                 ExplodedHelper.processIntoJars(mProject, mAndroidArchiveLibraries, mJarFiles, dustDir)
             }

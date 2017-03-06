@@ -36,7 +36,7 @@ class VariantProcessor {
             throw new RuntimeException("Can not find task ${taskPath}!")
         }
 
-        processClassesAndJars(prepareTask)
+        processClassesAndJars()
 
         if (mAndroidArchiveLibraries.isEmpty()) {
             return
@@ -84,7 +84,7 @@ class VariantProcessor {
         processManifestTask.finalizedBy manifestsMergeTask
     }
 
-    private void processClassesAndJars(Task prepareTask) {
+    private void processClassesAndJars() {
         if (mVariant.getBuildType().isMinifyEnabled()) {
             for (archiveLibrary in mAndroidArchiveLibraries) {
                 File thirdProguard = archiveLibrary.proguardRules
@@ -103,7 +103,12 @@ class VariantProcessor {
                 ExplodedHelper.processIntoClasses(mProject, mAndroidArchiveLibraries, mJarFiles, dustDir)
             }
         } else {
-            prepareTask.doLast {
+            String taskPath = 'transformClassesAndResourcesWithSyncLibJarsFor' + mVariant.name.capitalize()
+            Task syncLibTask = mProject.tasks.findByPath(taskPath)
+            if (syncLibTask == null) {
+                throw new RuntimeException("Can not find task ${taskPath}!")
+            }
+            syncLibTask.doLast {
                 def dustDir = mProject.file(AndroidPluginHelper.resolveBundleDir(mProject, mVariant).path + '/libs')
 //                FileUtils.cleanDirectory(dustDir)
                 ExplodedHelper.processIntoJars(mProject, mAndroidArchiveLibraries, mJarFiles, dustDir)

@@ -82,10 +82,10 @@ See [anatomy of an aar file here][2].
 
 ## Known Defects or Issues
 
+* **[issue]android plugin 2.3.0 build failed.** When you use android plugin 2.3.0, [disable build-cache][4].
 * **Proguard note.** Produce lots of(maybe) `Note: duplicate definition of library class`, while proguard is on. A workaround is to add `-dontnote` in `proguard-rules.pro`.
 * **The overlay order of res merge is changed:** Embedded dependency has higher priority than other dependencies.
 * **Res merge conflicts.** If the library res folder and embedded dependencies res have the same res Id(mostly `string/app_name`). A duplicate resources build exception will be thrown. To avoid res conflicts, consider using a prefix to each res Id, both in library res and aar dependencies if possible.
-* **[issue]android plugin 2.3.0 build failed.** Add support to 2.3.0. Support [build-cache][4].
 * More issue or defect is welcomed...
 
 ## Thanks
@@ -94,4 +94,4 @@ See [anatomy of an aar file here][2].
 [1]: https://github.com/adwiv/android-fat-aar
 [2]: https://developer.android.com/studio/projects/android-library.html#aar-contents
 [3]: https://developer.android.com/studio/releases/gradle-plugin.html
-[4]: https://developer.android.com/studio/build/build-cache.html
+[4]: https://developer.android.com/studio/build/build-cache.html#disable_build_cache

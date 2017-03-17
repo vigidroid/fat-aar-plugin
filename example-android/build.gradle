@@ -3,14 +3,14 @@
 buildscript {
     repositories {
         jcenter()
-        maven {
-            url  "http://dl.bintray.com/vigidroid/maven"
-        }
-//        mavenLocal()
+//        maven {
+//            url  "http://dl.bintray.com/vigidroid/maven"
+//        }
+        mavenLocal()
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:2.3.0'
-        classpath 'me.vigi:fat-aar-plugin:0.2.8'
+        classpath 'me.vigi:fat-aar-plugin:0.5.0-pre'
 
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files

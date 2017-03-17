@@ -24,6 +24,7 @@ class FatLibraryPlugin implements Plugin<Project> {
         this.project = project
         checkAndroidPlugin()
         createConfiguration()
+        project.android.registerTransform(new TestTransform())
         project.afterEvaluate {
             resolveArtifacts()
             project.android.libraryVariants.all { variant ->

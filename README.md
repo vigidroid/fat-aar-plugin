@@ -86,7 +86,7 @@ See [anatomy of an aar file here][2].
 * **Proguard note.** Produce lots of(maybe) `Note: duplicate definition of library class`, while proguard is on. A workaround is to add `-dontnote` in `proguard-rules.pro`.
 * **The overlay order of res merge is changed:** Embedded dependency has higher priority than other dependencies.
 * **Res merge conflicts.** If the library res folder and embedded dependencies res have the same res Id(mostly `string/app_name`). A duplicate resources build exception will be thrown. To avoid res conflicts, consider using a prefix to each res Id, both in library res and aar dependencies if possible.
-* More issue or defect is welcomed...
+* [More issue or defect][5] is welcomed...
 
 ## Thanks
 [android-fat-aar][1]
@@ -95,3 +95,4 @@ See [anatomy of an aar file here][2].
 [2]: https://developer.android.com/studio/projects/android-library.html#aar-contents
 [3]: https://developer.android.com/studio/releases/gradle-plugin.html
 [4]: https://developer.android.com/studio/build/build-cache.html#disable_build_cache
+[5]: https://github.com/Vigi0303/fat-aar-plugin/issues

@@ -5,6 +5,7 @@
 This is a gradle plugin that helps to output fat aar from android library. I am inspired by [android-fat-aar][1]. And aim to make more flexible and functional. It's convenient to **sdk developer**(developer that provide a single aar library).
 
 It works with [the android gradle plugin][3], the android plugin's version of the development is `2.2.3`, other revision is not tested actually. Commit an issue as you encounter some compatibility.
+**Update: Android plugin version 2.3.0 and later, is not supported. So the recommend version is 2.2.3 and prior. Look [this issue][6] for more.**
 
 Essentially, `fat-aar-plugin` makes a hack way, to collect resources, jar files and something others in embedded dependencies, into the bundled output aar. Click [here](#about-aar-file) to know more about `AAR`.
 
@@ -96,3 +97,4 @@ See [anatomy of an aar file here][2].
 [3]: https://developer.android.com/studio/releases/gradle-plugin.html
 [4]: https://developer.android.com/studio/build/build-cache.html#disable_build_cache
 [5]: https://github.com/Vigi0303/fat-aar-plugin/issues
+[6]: https://github.com/Vigi0303/fat-aar-plugin/issues/4

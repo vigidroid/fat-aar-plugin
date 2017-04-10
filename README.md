@@ -5,7 +5,8 @@
 This is a gradle plugin that helps to output fat aar from android library. I am inspired by [android-fat-aar][1]. And aim to make more flexible and functional. It's convenient to **sdk developer**(developer that provide a single aar library).
 
 It works with [the android gradle plugin][3], the android plugin's version of the development is `2.2.3`, other revision is not tested actually. Commit an issue as you encounter some compatibility.
-**Update: Android plugin version 2.3.0 and later, is not supported. So the recommend version is 2.2.3 and prior. Look [this issue][6] for more.**
+
+**Update: Android plugin version 2.3.0 and later, is not well supported. [disable build-cache][4] may do the trick. So the recommend version is 2.2.3 and prior. Look [this issue][6] for more.**
 
 Essentially, `fat-aar-plugin` makes a hack way, to collect resources, jar files and something others in embedded dependencies, into the bundled output aar. Click [here](#about-aar-file) to know more about `AAR`.
 
@@ -83,7 +84,6 @@ See [anatomy of an aar file here][2].
 
 ## Known Defects or Issues
 
-* **[issue]android plugin 2.3.0 build failed.** When you use android plugin 2.3.0, [disable build-cache][4].
 * **Proguard note.** Produce lots of(maybe) `Note: duplicate definition of library class`, while proguard is on. A workaround is to add `-dontnote` in `proguard-rules.pro`.
 * **The overlay order of res merge is changed:** Embedded dependency has higher priority than other dependencies.
 * **Res merge conflicts.** If the library res folder and embedded dependencies res have the same res Id(mostly `string/app_name`). A duplicate resources build exception will be thrown. To avoid res conflicts, consider using a prefix to each res Id, both in library res and aar dependencies if possible.

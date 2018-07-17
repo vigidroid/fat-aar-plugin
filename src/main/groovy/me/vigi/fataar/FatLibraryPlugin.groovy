@@ -90,7 +90,7 @@ class FatLibraryPlugin implements Plugin<Project> {
                 processor.addAndroidArchiveLibrary(archiveLibrary)
             }
             if ('jar'.equals(artifact.type)) {
-                processor.addJarFile(artifact.file)
+                processor.addJarFile(artifact)
             }
         }
         processor.processVariant()

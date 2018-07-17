@@ -1,6 +1,7 @@
 package me.vigi.fataar
 
 import org.gradle.api.Project
+import org.gradle.api.artifacts.ResolvedArtifact
 
 /**
  * Created by Vigi on 2017/1/20.
@@ -8,7 +9,7 @@ import org.gradle.api.Project
 class ExplodedHelper {
 
     public static void processIntoJars(Project project,
-                                       Collection<AndroidArchiveLibrary> androidLibraries, Collection<File> jarFiles,
+                                       Collection<AndroidArchiveLibrary> androidLibraries, Collection<ResolvedArtifact> jarFiles,
                                        File folderOut) {
         for (androidLibrary in androidLibraries) {
             if (!androidLibrary.rootFolder.exists()) {
@@ -16,7 +17,7 @@ class ExplodedHelper {
                 continue
             }
 //          println 'fat-aar-->copy aar from: ' + androidLibrary.rootFolder
-            def prefix = androidLibrary.name + '-' + androidLibrary.version
+            def prefix = androidLibrary.group + '-' + androidLibrary.name + '-' + androidLibrary.version
             project.copy {
                 from(androidLibrary.classesJarFile)
                 into folderOut
@@ -28,23 +29,26 @@ class ExplodedHelper {
                 rename { prefix + '-' + it }
             }
         }
-        for (jarFile in jarFiles) {
-            if (!jarFile.exists()) {
-                println 'fat-aar-->[warning]' + jarFile + ' not found!'
+        for (ResolvedArtifact jarFile in jarFiles) {
+            if (!jarFile.file.exists()) {
+                println 'fat-aar-->[warning] ' + jarFile.file + ' not found!'
                 continue
             }
+            def id = jarFile.getModuleVersion().getId()
+            def prefix = id.group + '-' + id.name + '-' + id.version
 //          println 'fat-aar-->copy jar from: ' + jarFile
             project.copy {
-                from(jarFile)
+                from(jarFile.file)
                 into folderOut
+                rename { prefix + '-' + it }
             }
         }
     }
 
     public static void processIntoClasses(Project project,
-                                          Collection<AndroidArchiveLibrary> androidLibraries, Collection<File> jarFiles,
+                                          Collection<AndroidArchiveLibrary> androidLibraries, Collection<ResolvedArtifact> jarFiles,
                                           File folderOut) {
-        Collection<File> allJarFiles = new ArrayList<>()
+        Collection<ResolvedArtifact> allJarFiles = new ArrayList<>()
         for (androidLibrary in androidLibraries) {
             if (!androidLibrary.rootFolder.exists()) {
                 println 'fat-aar-->[warning]' + androidLibrary.rootFolder + ' not found!'
@@ -53,17 +57,17 @@ class ExplodedHelper {
             allJarFiles.add(androidLibrary.classesJarFile)
             allJarFiles.addAll(androidLibrary.localJars)
         }
-        for (jarFile in jarFiles) {
-            if (!jarFile.exists()) {
-                println 'fat-aar-->[warning]' + jarFile + ' not found!'
+        for (ResolvedArtifact jarFile in jarFiles) {
+            if (!jarFile.file.exists()) {
+                println 'fat-aar-->[warning] ' + jarFile.file + ' not found!'
                 continue
             }
             allJarFiles.add(jarFile)
         }
-        for (jarFile in allJarFiles) {
-//          println 'fat-aar-->copy classes from: ' + jarFile
+        for (ResolvedArtifact jarFile in allJarFiles) {
+//          println 'fat-aar-->copy classes from: ' + jarFile.file
             project.copy {
-                from project.zipTree(jarFile)
+                from project.zipTree(jarFile.file)
                 into folderOut
                 include '**/*.class'
                 exclude 'META-INF/'

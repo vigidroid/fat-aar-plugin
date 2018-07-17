@@ -2,6 +2,7 @@ package me.vigi.fataar
 
 import org.gradle.api.Project
 import org.gradle.api.Task
+import org.gradle.api.artifacts.ResolvedArtifact
 
 /**
  * Created by Vigi on 2017/2/24.
@@ -14,7 +15,7 @@ class VariantProcessor {
 
     private Collection<AndroidArchiveLibrary> mAndroidArchiveLibraries = new ArrayList<>()
 
-    private Collection<File> mJarFiles = new ArrayList<>()
+    private Collection<ResolvedArtifact> mJarFiles = new ArrayList<>()
 
     public VariantProcessor(Project project, variant) {
         mProject = project
@@ -25,7 +26,7 @@ class VariantProcessor {
         mAndroidArchiveLibraries.add(library)
     }
 
-    public void addJarFile(File jar) {
+    public void addJarFile(ResolvedArtifact jar) {
         mJarFiles.add(jar)
     }
 

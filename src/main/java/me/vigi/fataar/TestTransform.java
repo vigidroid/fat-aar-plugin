@@ -24,12 +24,12 @@ public class TestTransform extends Transform {
     }
 
     @Override
-    public Set<? super QualifiedContent.Scope> getScopes() {
+    public Set<QualifiedContent.Scope> getScopes() {
         return ImmutableSet.of();
     }
 
     @Override
-    public Set<? super QualifiedContent.Scope> getReferencedScopes() {
+    public Set<QualifiedContent.Scope> getReferencedScopes() {
         return ImmutableSet.of(
 //                QualifiedContent.Scope.PROJECT,               // current project classes dir
 //                QualifiedContent.Scope.PROJECT_LOCAL_DEPS,    // local jars

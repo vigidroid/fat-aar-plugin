@@ -1,3 +1,7 @@
+# Deprecated
+
+**This repo is Deprecated. As the version of android gradle plugin keep increasing, I don't have enough time to keep supporting. And it stopped at `0.2.8`, which supports android plugin at [`2.2.3` and prior](https://developer.android.com/studio/releases/gradle-plugin#2-2-0).**
+
 # fat-aar-plugin
 
 [ ![Download](https://api.bintray.com/packages/vigidroid/maven/fat-aar-plugin/images/download.svg) ](https://bintray.com/vigidroid/maven/fat-aar-plugin/_latestVersion)
